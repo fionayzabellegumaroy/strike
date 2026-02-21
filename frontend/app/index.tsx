@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useRouter } from "expo-router";
 import {
   View,
   Text,
@@ -7,7 +8,6 @@ import {
   StyleSheet,
   Dimensions,
   ScrollView,
-  Animated,
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
@@ -15,90 +15,115 @@ import Svg, { Ellipse, Path, Circle, Defs, RadialGradient, Stop } from "react-na
 
 const { width, height } = Dimensions.get("window");
 
-// ── Watercolor blob background painted in SVG ──────────────────────────────
+// ── Color palette ────────────────────────────────────────────────────────────
+const C = {
+  lightGreen:  "#a3c988",
+  darkGreen:   "#85a75c",
+  blue:        "#a6c1dc",
+  yellow:      "#f4dc81",
+  magenta:     "#c798c1",
+  pink:        "#fbdbf3",
+  bg:          "#f7f5ef",
+  dark:        "#2e3a1e",
+  mid:         "#5a6e3a",
+  muted:       "#8a9a72",
+};
+
+// ── Watercolor blob background ───────────────────────────────────────────────
 function WatercolorBackground() {
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
       <Svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
         <Defs>
           <RadialGradient id="sky" cx="50%" cy="0%" r="80%">
-            <Stop offset="0%" stopColor="#D6EAF0" stopOpacity="0.9" />
-            <Stop offset="100%" stopColor="#F5EDE3" stopOpacity="0.4" />
+            <Stop offset="0%" stopColor={C.blue} stopOpacity="0.5" />
+            <Stop offset="100%" stopColor={C.pink} stopOpacity="0.2" />
           </RadialGradient>
-          <RadialGradient id="blob1" cx="50%" cy="50%" r="50%">
-            <Stop offset="0%" stopColor="#A8C5B0" stopOpacity="0.45" />
-            <Stop offset="100%" stopColor="#A8C5B0" stopOpacity="0" />
+          <RadialGradient id="blobGreen" cx="50%" cy="50%" r="50%">
+            <Stop offset="0%" stopColor={C.lightGreen} stopOpacity="0.55" />
+            <Stop offset="100%" stopColor={C.lightGreen} stopOpacity="0" />
           </RadialGradient>
-          <RadialGradient id="blob2" cx="50%" cy="50%" r="50%">
-            <Stop offset="0%" stopColor="#E8B8A0" stopOpacity="0.4" />
-            <Stop offset="100%" stopColor="#E8B8A0" stopOpacity="0" />
+          <RadialGradient id="blobYellow" cx="50%" cy="50%" r="50%">
+            <Stop offset="0%" stopColor={C.yellow} stopOpacity="0.5" />
+            <Stop offset="100%" stopColor={C.yellow} stopOpacity="0" />
           </RadialGradient>
-          <RadialGradient id="blob3" cx="50%" cy="50%" r="50%">
-            <Stop offset="0%" stopColor="#B8C8E0" stopOpacity="0.38" />
-            <Stop offset="100%" stopColor="#B8C8E0" stopOpacity="0" />
+          <RadialGradient id="blobBlue" cx="50%" cy="50%" r="50%">
+            <Stop offset="0%" stopColor={C.blue} stopOpacity="0.45" />
+            <Stop offset="100%" stopColor={C.blue} stopOpacity="0" />
           </RadialGradient>
-          <RadialGradient id="blob4" cx="50%" cy="50%" r="50%">
-            <Stop offset="0%" stopColor="#D4B8D0" stopOpacity="0.3" />
-            <Stop offset="100%" stopColor="#D4B8D0" stopOpacity="0" />
+          <RadialGradient id="blobMagenta" cx="50%" cy="50%" r="50%">
+            <Stop offset="0%" stopColor={C.magenta} stopOpacity="0.35" />
+            <Stop offset="100%" stopColor={C.magenta} stopOpacity="0" />
+          </RadialGradient>
+          <RadialGradient id="blobPink" cx="50%" cy="50%" r="50%">
+            <Stop offset="0%" stopColor={C.pink} stopOpacity="0.5" />
+            <Stop offset="100%" stopColor={C.pink} stopOpacity="0" />
           </RadialGradient>
         </Defs>
 
         {/* Sky wash */}
-        <Ellipse cx={width / 2} cy={-20} rx={width * 0.9} ry={height * 0.55} fill="url(#sky)" />
+        <Ellipse cx={width / 2} cy={-30} rx={width * 0.95} ry={height * 0.52} fill="url(#sky)" />
 
-        {/* Sage green blob top-left */}
-        <Ellipse cx={-40} cy={height * 0.18} rx={220} ry={200} fill="url(#blob1)" />
+        {/* Light green — top left */}
+        <Ellipse cx={-50} cy={height * 0.16} rx={230} ry={210} fill="url(#blobGreen)" />
 
-        {/* Peach blob right */}
-        <Ellipse cx={width + 30} cy={height * 0.35} rx={260} ry={220} fill="url(#blob2)" />
+        {/* Yellow — top right */}
+        <Ellipse cx={width + 40} cy={height * 0.22} rx={250} ry={200} fill="url(#blobYellow)" />
 
-        {/* Dusty blue blob bottom */}
-        <Ellipse cx={width * 0.3} cy={height * 0.82} rx={240} ry={190} fill="url(#blob3)" />
+        {/* Blue — mid left */}
+        <Ellipse cx={width * 0.1} cy={height * 0.55} rx={200} ry={180} fill="url(#blobBlue)" />
 
-        {/* Lavender mist bottom-right */}
-        <Ellipse cx={width * 0.9} cy={height * 0.75} rx={210} ry={180} fill="url(#blob4)" />
+        {/* Magenta — mid right */}
+        <Ellipse cx={width + 20} cy={height * 0.58} rx={220} ry={200} fill="url(#blobMagenta)" />
 
-        {/* Soft grass hills at bottom — painterly strokes */}
+        {/* Pink — bottom */}
+        <Ellipse cx={width * 0.6} cy={height * 0.9} rx={260} ry={200} fill="url(#blobPink)" />
+
+        {/* Painterly grass hills */}
         <Path
-          d={`M0 ${height * 0.88} Q${width * 0.25} ${height * 0.78} ${width * 0.5} ${height * 0.84} Q${width * 0.75} ${height * 0.9} ${width} ${height * 0.8} L${width} ${height} L0 ${height} Z`}
-          fill="#B8D4B0"
-          opacity={0.28}
+          d={`M0 ${height*0.87} Q${width*0.2} ${height*0.77} ${width*0.5} ${height*0.83} Q${width*0.78} ${height*0.89} ${width} ${height*0.79} L${width} ${height} L0 ${height} Z`}
+          fill={C.lightGreen} opacity={0.3}
         />
         <Path
-          d={`M0 ${height * 0.93} Q${width * 0.3} ${height * 0.87} ${width * 0.6} ${height * 0.91} Q${width * 0.8} ${height * 0.94} ${width} ${height * 0.88} L${width} ${height} L0 ${height} Z`}
-          fill="#9EC49A"
-          opacity={0.22}
+          d={`M0 ${height*0.93} Q${width*0.35} ${height*0.86} ${width*0.65} ${height*0.9} Q${width*0.82} ${height*0.93} ${width} ${height*0.87} L${width} ${height} L0 ${height} Z`}
+          fill={C.darkGreen} opacity={0.2}
         />
 
-        {/* Tiny floating spores / soot sprites ✦ */}
-        {[[width*0.15, height*0.22], [width*0.78, height*0.3], [width*0.55, height*0.15], [width*0.88, height*0.55], [width*0.08, height*0.6]].map(([cx, cy], i) => (
-          <Circle key={i} cx={cx} cy={cy} r={3 + (i % 3)} fill="#C4A882" opacity={0.35 + i*0.04} />
+        {/* Floating spores in palette colors */}
+        {[
+          [width*0.12, height*0.2,  C.yellow,  0.5],
+          [width*0.82, height*0.28, C.magenta, 0.4],
+          [width*0.55, height*0.13, C.blue,    0.45],
+          [width*0.9,  height*0.5,  C.pink,    0.5],
+          [width*0.06, height*0.62, C.lightGreen, 0.4],
+          [width*0.7,  height*0.72, C.yellow,  0.35],
+        ].map(([cx, cy, color, opacity], i) => (
+          <Circle key={i} cx={cx} cy={cy} r={3 + (i % 3)} fill={color} opacity={opacity} />
         ))}
       </Svg>
     </View>
   );
 }
 
-// ── Totoro-ish acorn deco icon ──────────────────────────────────────────────
-function AcornIcon() {
+// ── Sprout icon ──────────────────────────────────────────────────────────────
+function SproutIcon() {
   return (
-    <Svg width={64} height={72} viewBox="0 0 64 72">
-      {/* cap */}
-      <Ellipse cx={32} cy={22} rx={26} ry={14} fill="#7A9E7E" opacity={0.85} />
-      <Ellipse cx={32} cy={20} rx={22} ry={10} fill="#8FB890" opacity={0.7} />
-      {/* stem */}
-      <Path d="M32 20 Q36 10 40 6" stroke="#7A9E7E" strokeWidth={2.5} strokeLinecap="round" fill="none" opacity={0.8} />
-      {/* body */}
-      <Ellipse cx={32} cy={46} rx={20} ry={24} fill="#D4A574" opacity={0.9} />
-      <Ellipse cx={32} cy={46} rx={20} ry={24} fill="#C49060" opacity={0.3} />
-      {/* shine */}
-      <Ellipse cx={25} cy={38} rx={5} ry={7} fill="white" opacity={0.2} />
+    <Svg width={70} height={70} viewBox="0 0 70 70">
+      <Path d="M35 60 Q35 40 35 28" stroke={C.darkGreen} strokeWidth={3} strokeLinecap="round" fill="none" />
+      <Path d="M35 38 Q18 32 16 18 Q28 16 36 30" fill={C.lightGreen} opacity={0.9} />
+      <Path d="M35 30 Q52 24 54 10 Q42 8 34 22" fill={C.darkGreen} opacity={0.85} />
+      <Circle cx={35} cy={20} r={7} fill={C.yellow} opacity={0.9} />
+      <Circle cx={35} cy={20} r={4} fill={C.magenta} opacity={0.7} />
+      <Circle cx={25} cy={63} r={3} fill={C.lightGreen} opacity={0.5} />
+      <Circle cx={35} cy={65} r={4} fill={C.darkGreen} opacity={0.4} />
+      <Circle cx={45} cy={62} r={3} fill={C.lightGreen} opacity={0.5} />
     </Svg>
   );
 }
 
-// ── Main Landing Screen ─────────────────────────────────────────────────────
-export default function LandingPage({ navigation }) {
+// ── Main Landing Screen ──────────────────────────────────────────────────────
+export default function LandingPage() {
+  const router = useRouter();
   const [showLogin, setShowLogin] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -116,24 +141,24 @@ export default function LandingPage({ navigation }) {
         showsVerticalScrollIndicator={false}
       >
 
-        {/* ── Header wordmark ── */}
+        {/* ── Wordmark ── */}
         <View style={styles.wordmarkRow}>
           <Text style={styles.wordmark}>strike</Text>
           <View style={styles.dotAccent} />
         </View>
 
-        {/* ── Hero illustration area ── */}
+        {/* ── Hero ── */}
         <View style={styles.heroArea}>
-          <AcornIcon />
-          {/* Painterly tagline badge */}
+          <SproutIcon />
           <View style={styles.taglineBadge}>
-            <Text style={styles.taglineText}>who is free tonight?</Text>
+            <Text style={styles.taglineText}>{"who's free tonight?"}</Text>
           </View>
         </View>
 
-        {/* ── Main headline ── */}
+        {/* ── Headline ── */}
         <View style={styles.headlineBlock}>
-          <Text style={styles.headline}>Find your{"\n"}people,{" "}
+          <Text style={styles.headline}>
+            Find your{"\n"}people,{" "}
             <Text style={styles.headlineAccent}>right now.</Text>
           </Text>
           <Text style={styles.subline}>
@@ -141,21 +166,21 @@ export default function LandingPage({ navigation }) {
           </Text>
         </View>
 
-        {/* ── Verification note ── */}
+        {/* ── Verify badge ── */}
         <View style={styles.verifyRow}>
           <Text style={styles.verifyIcon}>🎓</Text>
           <Text style={styles.verifyText}>College students only · .edu verified</Text>
         </View>
 
-        {/* ── CTA Buttons ── */}
+        {/* ── Buttons / Login ── */}
         {!showLogin ? (
           <View style={styles.ctaBlock}>
             <TouchableOpacity
               style={styles.primaryBtn}
               activeOpacity={0.82}
-              onPress={() => {/* navigate to onboarding */}}
+              onPress={() => router.push("/verify")}
             >
-              <Text style={styles.primaryBtnText}>⚡  I am down to hang</Text>
+              <Text style={styles.primaryBtnText}>{"⚡  I'm down to hang"}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -167,7 +192,6 @@ export default function LandingPage({ navigation }) {
             </TouchableOpacity>
           </View>
         ) : (
-          /* ── Login form ── */
           <View style={styles.loginCard}>
             <Text style={styles.loginTitle}>Welcome back ✦</Text>
 
@@ -175,7 +199,7 @@ export default function LandingPage({ navigation }) {
             <TextInput
               style={styles.input}
               placeholder="you@university.edu"
-              placeholderTextColor="#B0A898"
+              placeholderTextColor={C.muted}
               keyboardType="email-address"
               autoCapitalize="none"
               value={email}
@@ -186,7 +210,7 @@ export default function LandingPage({ navigation }) {
             <TextInput
               style={styles.input}
               placeholder="••••••••"
-              placeholderTextColor="#B0A898"
+              placeholderTextColor={C.muted}
               secureTextEntry
               value={password}
               onChangeText={setPassword}
@@ -196,10 +220,7 @@ export default function LandingPage({ navigation }) {
               <Text style={styles.primaryBtnText}>Log in →</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.cancelBtn}
-              onPress={() => setShowLogin(false)}
-            >
+            <TouchableOpacity style={styles.cancelBtn} onPress={() => setShowLogin(false)}>
               <Text style={styles.cancelBtnText}>← Back</Text>
             </TouchableOpacity>
 
@@ -221,7 +242,7 @@ export default function LandingPage({ navigation }) {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: "#F2EBE0",   // warm parchment — Ghibli paper tone
+    backgroundColor: C.bg,
   },
   scroll: {
     paddingHorizontal: 28,
@@ -243,14 +264,14 @@ const styles = StyleSheet.create({
     fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia, serif" }),
     fontSize: 32,
     fontWeight: "700",
-    color: "#4A6741",        // muted Ghibli forest green
+    color: C.darkGreen,
     letterSpacing: -0.5,
     fontStyle: "italic",
   },
   dotAccent: {
     width: 8, height: 8,
     borderRadius: 4,
-    backgroundColor: "#D4856A",  // warm clay
+    backgroundColor: C.magenta,
     marginTop: 6,
   },
 
@@ -261,9 +282,9 @@ const styles = StyleSheet.create({
     gap: 14,
   },
   taglineBadge: {
-    backgroundColor: "rgba(168, 197, 176, 0.35)",
+    backgroundColor: "rgba(163, 201, 136, 0.25)",
     borderWidth: 1.5,
-    borderColor: "#A8C5B0",
+    borderColor: C.lightGreen,
     borderRadius: 50,
     paddingHorizontal: 20,
     paddingVertical: 8,
@@ -272,7 +293,7 @@ const styles = StyleSheet.create({
     fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia, serif" }),
     fontStyle: "italic",
     fontSize: 15,
-    color: "#4A6741",
+    color: C.darkGreen,
     letterSpacing: 0.3,
   },
 
@@ -285,43 +306,42 @@ const styles = StyleSheet.create({
     fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia, serif" }),
     fontSize: 42,
     fontWeight: "700",
-    color: "#2E3A28",
+    color: C.dark,
     textAlign: "center",
     lineHeight: 52,
     letterSpacing: -0.5,
     marginBottom: 14,
   },
   headlineAccent: {
-    color: "#C47A55",       // warm terracotta — Ghibli sunset
+    color: C.darkGreen,
     fontStyle: "italic",
   },
   subline: {
     fontFamily: Platform.select({ ios: "Palatino", android: "serif", default: "Palatino, serif" }),
     fontSize: 16,
-    color: "#7A6E64",
+    color: C.mid,
     textAlign: "center",
     lineHeight: 24,
-    letterSpacing: 0.1,
   },
 
-  // ── Verify
+  // ── Verify badge
   verifyRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    backgroundColor: "rgba(212, 197, 176, 0.3)",
+    backgroundColor: "rgba(244, 220, 129, 0.3)",
     borderRadius: 30,
     paddingHorizontal: 16,
     paddingVertical: 8,
     marginBottom: 36,
     borderWidth: 1,
-    borderColor: "rgba(180, 160, 130, 0.35)",
+    borderColor: "rgba(244, 220, 129, 0.7)",
   },
   verifyIcon: { fontSize: 16 },
   verifyText: {
     fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia, serif" }),
     fontSize: 13,
-    color: "#6B5E52",
+    color: C.mid,
     fontWeight: "600",
     letterSpacing: 0.2,
   },
@@ -335,11 +355,11 @@ const styles = StyleSheet.create({
     width: "100%",
     paddingVertical: 18,
     borderRadius: 18,
-    backgroundColor: "#4A6741",   // Ghibli forest green
+    backgroundColor: C.darkGreen,
     alignItems: "center",
-    shadowColor: "#4A6741",
+    shadowColor: C.darkGreen,
     shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.28,
+    shadowOpacity: 0.3,
     shadowRadius: 14,
     elevation: 6,
   },
@@ -347,7 +367,7 @@ const styles = StyleSheet.create({
     fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia, serif" }),
     fontSize: 17,
     fontWeight: "700",
-    color: "#F5EDE3",
+    color: "#ffffff",
     letterSpacing: 0.3,
   },
   secondaryBtn: {
@@ -357,27 +377,27 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     alignItems: "center",
     borderWidth: 2,
-    borderColor: "#A8C5B0",
+    borderColor: C.lightGreen,
   },
   secondaryBtnText: {
     fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia, serif" }),
     fontSize: 16,
     fontWeight: "600",
-    color: "#4A6741",
+    color: C.darkGreen,
     letterSpacing: 0.2,
   },
 
   // ── Login card
   loginCard: {
     width: "100%",
-    backgroundColor: "rgba(245, 237, 227, 0.88)",
+    backgroundColor: "rgba(251, 219, 243, 0.65)",
     borderRadius: 24,
     padding: 24,
     borderWidth: 1.5,
-    borderColor: "rgba(168, 197, 176, 0.5)",
-    shadowColor: "#A8C5B0",
+    borderColor: "rgba(199, 152, 193, 0.45)",
+    shadowColor: C.magenta,
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.15,
     shadowRadius: 20,
     elevation: 4,
     gap: 10,
@@ -386,7 +406,7 @@ const styles = StyleSheet.create({
     fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia, serif" }),
     fontSize: 22,
     fontWeight: "700",
-    color: "#2E3A28",
+    color: C.dark,
     fontStyle: "italic",
     marginBottom: 6,
     textAlign: "center",
@@ -394,7 +414,7 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia, serif" }),
     fontSize: 13,
-    color: "#7A6E64",
+    color: C.mid,
     fontWeight: "600",
     letterSpacing: 0.4,
     marginBottom: -4,
@@ -404,12 +424,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 13,
     borderRadius: 14,
-    backgroundColor: "rgba(255, 252, 247, 0.9)",
+    backgroundColor: "rgba(255, 255, 255, 0.75)",
     borderWidth: 1.5,
-    borderColor: "#C8D8C4",
+    borderColor: C.lightGreen,
     fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia, serif" }),
     fontSize: 15,
-    color: "#2E3A28",
+    color: C.dark,
   },
   cancelBtn: {
     alignItems: "center",
@@ -418,13 +438,13 @@ const styles = StyleSheet.create({
   cancelBtnText: {
     fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia, serif" }),
     fontSize: 14,
-    color: "#7A9E7E",
+    color: C.darkGreen,
     fontWeight: "600",
   },
   forgotText: {
     fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia, serif" }),
     fontSize: 13,
-    color: "#B0A898",
+    color: C.muted,
     textAlign: "center",
     textDecorationLine: "underline",
   },
@@ -438,7 +458,7 @@ const styles = StyleSheet.create({
     fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia, serif" }),
     fontStyle: "italic",
     fontSize: 12,
-    color: "#B0A898",
+    color: C.muted,
     letterSpacing: 1,
   },
 });
