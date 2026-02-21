@@ -150,9 +150,6 @@ export default function LandingPage() {
         {/* ── Hero ── */}
         <View style={styles.heroArea}>
           <SproutIcon />
-          <View style={styles.taglineBadge}>
-            <Text style={styles.taglineText}>{"who's free tonight?"}</Text>
-          </View>
         </View>
 
         {/* ── Headline ── */}

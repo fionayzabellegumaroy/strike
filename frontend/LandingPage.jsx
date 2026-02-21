@@ -127,7 +127,7 @@ export default function LandingPage({ navigation }) {
           <AcornIcon />
           {/* Painterly tagline badge */}
           <View style={styles.taglineBadge}>
-            <Text style={styles.taglineText}>who's free tonight?</Text>
+            <Text style={styles.taglineText}>who is free tonight?</Text>
           </View>
         </View>
 
@@ -155,7 +155,7 @@ export default function LandingPage({ navigation }) {
               activeOpacity={0.82}
               onPress={() => {/* navigate to onboarding */}}
             >
-              <Text style={styles.primaryBtnText}>⚡  I'm down to hang</Text>
+              <Text style={styles.primaryBtnText}>⚡  I am down to hang</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
