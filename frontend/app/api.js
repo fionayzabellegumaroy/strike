@@ -56,3 +56,9 @@ export async function sendNudge(fromId, toId) {
 export async function deleteProfile(id) {
   await fetch(`${BASE_URL}/profile/${id}`, { method: "DELETE" });
 }
+
+export async function test(){
+  const res = await fetch(`${BASE_URL}/test`);
+  if (!res.ok) throw new Error(`GET /test failed: ${res.status}`);
+  return res.json()
+}

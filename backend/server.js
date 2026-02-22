@@ -50,6 +50,16 @@ function distanceMiles(lat1, lng1, lat2, lng2) {
 // Normalize tag strings for comparison (strip whitespace, lowercase)
 const normalize = t => t.trim().toLowerCase();
 
+// ── GET / ─────────────────────────────────────────────────────────────────
+app.get("/", (req, res) => {
+  res.json({ status: "ok", message: "Strike API running" });
+});
+
+// ── GET /test ──────────────────────────────────────────────────────────────
+app.get("/test", (req, res) => {
+  res.json({ success: true });
+});
+
 // ── POST /profile ──────────────────────────────────────────────────────────
 app.post("/profile", (req, res) => {
   const { name, avatar, lat, lng, availability, tags, color, light } = req.body;

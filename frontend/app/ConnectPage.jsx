@@ -58,6 +58,79 @@ function PulseRing({ color }) {
   );
 }
 
+function GroupModal({ onClose, onConfirm, onNavigate }) {
+  const [mode, setMode] = useState("one"); // "one" or "group"
+  const [groupSize, setGroupSize] = useState(2);
+
+  return (
+    <div style={overlayStyle}>
+      <div style={modalStyle}>
+        <h2 style={titleStyle}>
+          How do you want to hang out?
+        </h2>
+
+        {/* Option buttons */}
+        <div style={{ display: "flex", gap: 16, marginBottom: 20, justifyContent: "center" }}>
+          {/* <button
+            onClick={() => setMode("one")}
+            style={optionButton(mode === "one")}
+          >
+            1-on-1
+          </button> */}
+
+          <SketchButton
+            onClick={() => setMode("group")}
+            style={optionButton(mode === "group")}
+          >
+            Group
+          </SketchButton>
+        </div>
+
+        {/* Group size selector */}
+        {mode === "group" && (
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ marginBottom: 8 }}>How many people?</div>
+
+           <div style={{ display: "flex", alignItems: "center", gap: 12, justifyContent: "center" }}>
+            <SketchButton
+              onClick={() => setGroupSize(prev => Math.max(2, prev - 1))}
+              disabled={groupSize == 2}
+            >
+              −
+            </SketchButton>
+
+            <div style={{ fontSize: 20, minWidth: 30, textAlign: "center" }}>
+              {groupSize}
+            </div>
+
+            <SketchButton
+              onClick={() => setGroupSize(prev => Math.min(10, prev + 1))}
+              disabled={groupSize == 10}
+            >
+              +
+            </SketchButton>
+            </div>
+          </div>
+        )}
+
+        {/* Buttons */}
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <SketchButton onClick={onClose}>Cancel</SketchButton>
+
+          <SketchButton
+            onClick={() => {
+              onConfirm(mode === "one" ? 1 : groupSize);
+              onNavigate("home");
+            }}
+          >
+            Confirm
+          </SketchButton>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Match card ─────────────────────────────────────────────────────────────
 function MatchCard({ match, onStrike, struck }) {
   const [hovered, setHovered] = useState(false);
@@ -239,89 +312,53 @@ function LoadingSkeleton() {
   );
 }
 
-function GroupModal({ onClose, onConfirm, onNavigate }) {
-  const [mode, setMode] = useState("one"); // "one" or "group"
-  const [groupSize, setGroupSize] = useState(2);
-
+// ── Empty state ────────────────────────────────────────────────────────────
+function EmptyState({ onNavigate }) {
   return (
-    <div style={overlayStyle}>
-      <div style={modalStyle}>
-        <h2 style={titleStyle}>
-          How do you want to hang out?
-        </h2>
-
-        {/* Option buttons */}
-        <div style={{ display: "flex", gap: 16, marginBottom: 20, justifyContent: "center" }}>
-          {/* <button
-            onClick={() => setMode("one")}
-            style={optionButton(mode === "one")}
-          >
-            1-on-1
-          </button> */}
-
-          <SketchButton
-            onClick={() => setMode("group")}
-            style={optionButton(mode === "group")}
-          >
-            Group
-          </SketchButton>
-        </div>
-
-        {/* Group size selector */}
-        {mode === "group" && (
-          <div style={{ marginBottom: 20 }}>
-            <div style={{ marginBottom: 8 }}>How many people?</div>
-
-           <div style={{ display: "flex", alignItems: "center", gap: 12, justifyContent: "center" }}>
-            <SketchButton
-              onClick={() => setGroupSize(prev => Math.max(2, prev - 1))}
-              disabled={groupSize == 2}
-            >
-              −
-            </SketchButton>
-
-            <div style={{ fontSize: 20, minWidth: 30, textAlign: "center" }}>
-              {groupSize}
-            </div>
-
-            <SketchButton
-              onClick={() => setGroupSize(prev => Math.min(10, prev + 1))}
-              disabled={groupSize == 10}
-            >
-              +
-            </SketchButton>
-            </div>
-          </div>
-        )}
-
-        {/* Buttons */}
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <SketchButton onClick={onClose}>Cancel</SketchButton>
-
-          <SketchButton
-            onClick={() => {
-              onConfirm(mode === "one" ? 1 : groupSize);
-              onNavigate("home");
-            }}
-          >
-            Confirm
-          </SketchButton>
-        </div>
+    <div style={{ textAlign: "center", padding: "40px 0" }}>
+      <div style={{ fontSize: 40, marginBottom: 12 }}>🌿</div>
+      <div style={{ fontFamily: "'Caveat', cursive", fontSize: 20, color: palette.inkBrown, fontStyle: "italic", opacity: 0.6 }}>
+        no one nearby right now...
       </div>
+      <div style={{ fontFamily: "'Caveat', cursive", fontSize: 14, color: palette.softInk, opacity: 0.4, marginTop: 6, marginBottom: 20 }}>
+        try a wider radius or a different time
+      </div>
+      <SketchButton
+        color={palette.waterGold} lightColor={palette.waterGoldLight}
+        onClick={() => onNavigate("info")}
+        wide={false}
+      >
+        ← change my time
+      </SketchButton>
     </div>
   );
 }
 
-// ── Main Connect Page ─────────────────────────────────────────────────────
+// ── Error state ────────────────────────────────────────────────────────────
+function ErrorState({ message, onRetry }) {
+  return (
+    <div style={{ textAlign: "center", padding: "40px 0" }}>
+      <div style={{ fontSize: 36, marginBottom: 12 }}>⚠️</div>
+      <div style={{ fontFamily: "'Caveat', cursive", fontSize: 16, color: palette.waterRose, fontStyle: "italic", marginBottom: 16 }}>
+        {message}
+      </div>
+      <SketchButton color={palette.waterGreen} lightColor={palette.waterGreenLight} onClick={onRetry}>
+        try again
+      </SketchButton>
+    </div>
+  );
+}
+
+// ── Main ConnectPage ───────────────────────────────────────────────────────
 export default function ConnectPage({ onNavigate, userInfo = {} }) {
-  const { name = "you", tags = [], time = "now" } = userInfo;
-  const [struckIds, setStruckIds] = useState([]);
-  const [groupModal, setGroupModal] = useState(false);
+  const { id: userId, name = "you", tags = [], dateTime, lat, lng } = userInfo;
+
   const [matches,     setMatches]     = useState([]);
   const [loading,     setLoading]     = useState(true);
   const [error,       setError]       = useState(null);
-
-  console.log("struck id length: ", struckIds.length);
+  const [struckIds,   setStruckIds]   = useState([]);
+  const [activeModal, setActiveModal] = useState(null);
+  const [groupModal,  setGroupModal]  = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -475,30 +512,37 @@ export default function ConnectPage({ onNavigate, userInfo = {} }) {
               }}>     
           <SketchButton style={{ color: palette.waterBlue, lightColor: palette.waterBlueLight, position: "relative", zIndex: 1 }} onClick={() => {setGroupModal(true)}} disabled={struckIds.length === 0}>
               continue
-            </SketchButton>
+          </SketchButton>
       </div>
 
       {/* Group modal */}
       {groupModal && (
         <GroupModal
-          onNavigate={onNavigate}
-          onClose={() => setGroupModal(false)}
-          onConfirm={(groupSize) => {
-            console.log("Selected group size:", groupSize);
-            setGroupModal(false);
+           onNavigate={onNavigate}
+           onClose={() => setGroupModal(false)}
+           onConfirm={(groupSize) => {
+             console.log("Selected group size:", groupSize);
+             setGroupModal(false);
 
-            // You can now send this to backend later
-            // Example:
-            // createGroup({ struckIds, groupSize })
-          }}
-        />
-      )}
+              // You can now send this to backend later
+              // Example:
+              // createGroup({ struckIds, groupSize })
+           }}
+         />
+       )}
 
       <Footer />
 
+      {activeModal && (
+        <StruckModal
+          match={activeModal}
+          onClose={() => setActiveModal(null)}
+        />
+      )}
     </PageShell>
   );
 }
+
 
 const overlayStyle = {
   position: "fixed",

@@ -203,10 +203,7 @@ export default function StepTime({ name, tags, onDone }) {
   );
 
   const now = new Date();
-
-  console.log("Selected:", selectedDateTime);
-  console.log("Now:", now);
-
+  
   return selectedDateTime.getTime() <= now.getTime();
 };
 
