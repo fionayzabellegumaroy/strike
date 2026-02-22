@@ -108,8 +108,8 @@ export default function HomePage({ onNavigate }) {
           Home
         </h1>
         <p style={{
-          fontFamily: "'Caveat', cursive", fontSize: 17, color: palette.softInk,
-          opacity: 0.7, margin: 0, lineHeight: 1.5, fontStyle: "italic",
+          fontFamily: "'Inconsolata', monospace", fontSize: 17, color: palette.softInk,
+          opacity: 0.7, margin: 0, lineHeight: 1.5, 
         }}>
           Find your active groups, and public groups to join.
         </p>

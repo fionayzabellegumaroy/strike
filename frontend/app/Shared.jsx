@@ -282,7 +282,7 @@ export function WatercolorCard({ children, color, lightColor, shake = false, rot
         `,
         filter: "url(#watercolor) blur(2px)",
         zIndex: 0, pointerEvents: "none",
-        lightColor: palette.waterBlue
+      
       }} />
       <div style={{
         position: "absolute", inset: "-10px -12px -12px -10px",
