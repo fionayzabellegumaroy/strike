@@ -1,9 +1,10 @@
 // ── ConnectPage.jsx — browse matches, send a strike ──────────────────────
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   palette, PageShell, WatercolorBlob, SketchButton,
   WatercolorCard, TopBar, Footer, SectionLabel,
 } from "./Shared";
+import { fetchMatches, sendNudge } from "./api.js";
 
 const BLOBS = (
   <>
@@ -29,64 +30,64 @@ const SPORES = [
   [50,  500, palette.waterBlue,     0.30, 0.3, 12],
 ];
 
-// ── Fake match data ───────────────────────────────────────────────────────
-const MOCK_MATCHES = [
-  {
-    id: 1, name: "Maya", distance: "0.3mi", time: "free now!",
-    tags: ["☕ coffee", "📚 studying", "🎨 art"],
-    color: palette.waterRose, light: palette.waterRoseLight, rotation: -1.2,
-    avatar: "🌸",
-  },
-  {
-    id: 2, name: "Theo", distance: "0.6mi", time: "free this afternoon",
-    tags: ["🎮 gaming", "🎵 music", "💻 tech"],
-    color: palette.waterBlue, light: palette.waterBlueLight, rotation: 0.8,
-    avatar: "🌊",
-  },
-  {
-    id: 3, name: "Priya", distance: "0.4mi", time: "free this evening",
-    tags: ["🌿 outdoors", "🏃 active", "🐾 pets"],
-    color: palette.waterGreen, light: palette.waterGreenLight, rotation: -0.5,
-    avatar: "🌿",
-  },
-  {
-    id: 4, name: "Jordan", distance: "1.1mi", time: "free this weekend",
-    tags: ["📖 reading", "☕ coffee", "✈️ travel"],
-    color: palette.waterGold, light: palette.waterGoldLight, rotation: 1.0,
-    avatar: "✨",
-  },
+// Map DB color values → watercolor palette pairs for card rendering
+const COLOR_PAIRS = [
+  { color: palette.waterRose,     light: palette.waterRoseLight },
+  { color: palette.waterBlue,     light: palette.waterBlueLight },
+  { color: palette.waterGreen,    light: palette.waterGreenLight },
+  { color: palette.waterGold,     light: palette.waterGoldLight },
+  { color: palette.waterLavender, light: palette.waterLavenderLight },
 ];
 
-// ── Pulse ring indicator ──────────────────────────────────────────────────
+function getColorPair(dbColor) {
+  // Try to match to a palette color; fall back to a deterministic pick
+  const match = COLOR_PAIRS.find(p => p.color === dbColor);
+  if (match) return match;
+  // Hash the color string to pick consistently
+  const idx = [...(dbColor || "")].reduce((a, c) => a + c.charCodeAt(0), 0) % COLOR_PAIRS.length;
+  return COLOR_PAIRS[idx];
+}
+
+// ── Pulse ring ────────────────────────────────────────────────────────────
 function PulseRing({ color }) {
   return (
     <div style={{ position: "relative", width: 10, height: 10, display: "inline-block", marginRight: 6 }}>
-      <div style={{
-        position: "absolute", inset: 0, borderRadius: "50%",
-        background: color, animation: "pulseRing 2s ease-out infinite",
-      }} />
+      <div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: color, animation: "pulseRing 2s ease-out infinite" }} />
       <div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: color }} />
     </div>
   );
 }
 
-// ── Match card ────────────────────────────────────────────────────────────
+// ── Match card ─────────────────────────────────────────────────────────────
 function MatchCard({ match, onStrike, struck }) {
   const [hovered, setHovered] = useState(false);
+  const { color, light } = getColorPair(match.color);
+  const rotation = ((match.id * 7) % 30 - 15) / 10; // deterministic tilt from id
+
+  // Format availability: if it's an ISO string, show relative time
+  const availLabel = (() => {
+    try {
+      const d = new Date(match.availability);
+      if (isNaN(d)) return match.availability; // fallback for old string values
+      const diffH = Math.round((d - new Date()) / 36e5);
+      if (diffH < 0)    return "free now!";
+      if (diffH < 1)    return "free in under an hour";
+      if (diffH < 24)   return `free in ~${diffH}h`;
+      const days = Math.round(diffH / 24);
+      return `free in ~${days}d`;
+    } catch { return match.availability; }
+  })();
 
   return (
     <div
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        position: "relative",
-        padding: "22px 20px 18px",
-        transform: `rotate(${hovered ? match.rotation * 0.3 : match.rotation}deg) translateY(${hovered ? -4 : 0}px)`,
-        transition: "transform 0.3s ease",
-        cursor: "pointer",
-        marginBottom: 8,
-        animation: `cardReveal 0.5s ease both`,
-        "--card-rot": `${match.rotation}deg`,
+        position: "relative", padding: "22px 20px 18px",
+        transform: `rotate(${hovered ? rotation * 0.3 : rotation}deg) translateY(${hovered ? -4 : 0}px)`,
+        transition: "transform 0.3s ease", cursor: "pointer",
+        marginBottom: 8, animation: "cardReveal 0.5s ease both",
+        "--card-rot": `${rotation}deg`,
       }}
     >
       {/* Watercolor wash */}
@@ -94,12 +95,11 @@ function MatchCard({ match, onStrike, struck }) {
         position: "absolute", inset: "6px 7px 7px 6px",
         borderRadius: "12px 14px 13px 11px",
         background: `
-          radial-gradient(ellipse at 25% 25%, ${match.light} 0%, ${match.color}55 45%, transparent 72%),
-          radial-gradient(ellipse at 80% 75%, ${match.light}BB 0%, ${match.color}33 40%, transparent 65%)
+          radial-gradient(ellipse at 25% 25%, ${light} 0%, ${color}55 45%, transparent 72%),
+          radial-gradient(ellipse at 80% 75%, ${light}BB 0%, ${color}33 40%, transparent 65%)
         `,
         filter: "url(#watercolor) blur(2px)", zIndex: 0, pointerEvents: "none",
       }} />
-      {/* White bleed */}
       <div style={{
         position: "absolute", inset: "-10px -12px -12px -10px",
         borderRadius: "20px 24px 22px 18px",
@@ -110,7 +110,7 @@ function MatchCard({ match, onStrike, struck }) {
       <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", overflow: "visible", pointerEvents: "none", zIndex: 2 }}>
         <rect x="3" y="3" width="calc(100% - 6px)" height="calc(100% - 6px)"
           rx="7" fill="none"
-          stroke={struck ? match.color : "#5C4F8A"} strokeWidth={struck ? "3" : "2.5"}
+          stroke={struck ? color : "#5C4F8A"} strokeWidth={struck ? "3" : "2.5"}
           strokeLinecap="round" strokeLinejoin="round" style={{ filter: "url(#sketch)" }}
         />
       </svg>
@@ -121,35 +121,30 @@ function MatchCard({ match, onStrike, struck }) {
             {/* Avatar */}
             <div style={{
               width: 48, height: 48, borderRadius: "50%",
-              background: `radial-gradient(ellipse at 35% 35%, ${match.light} 0%, ${match.color}88 100%)`,
+              background: `radial-gradient(ellipse at 35% 35%, ${light} 0%, ${color}88 100%)`,
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 22, filter: "url(#roughBorder)",
-              flexShrink: 0,
+              fontSize: 22, filter: "url(#roughBorder)", flexShrink: 0,
             }}>
-              {match.avatar}
+              {match.avatar || "⚡"}
             </div>
             <div>
-              <div style={{
-                fontFamily: "'Caveat', cursive", fontSize: 22, fontWeight: 700,
-                color: palette.inkBrown, lineHeight: 1.1,
-              }}>{match.name}</div>
-              <div style={{
-                fontFamily: "'Caveat', cursive", fontSize: 13,
-                color: palette.softInk, opacity: 0.6, display: "flex", alignItems: "center",
-              }}>
+              <div style={{ fontFamily: "'Caveat', cursive", fontSize: 22, fontWeight: 700, color: palette.inkBrown, lineHeight: 1.1 }}>
+                {match.name}
+              </div>
+              <div style={{ fontFamily: "'Caveat', cursive", fontSize: 13, color: palette.softInk, opacity: 0.6, display: "flex", alignItems: "center" }}>
                 <PulseRing color={palette.waterGreen} />
-                {match.time} · {match.distance} away
+                {availLabel} · {match.distanceLabel} away
               </div>
             </div>
           </div>
 
           {/* Strike button */}
           <button
-            onClick={(e) => { e.stopPropagation(); onStrike(match.id); }}
+            onClick={e => { e.stopPropagation(); onStrike(match.id); }}
             style={{
               position: "relative", padding: "8px 14px",
               background: struck
-                ? `radial-gradient(ellipse at 35% 35%, ${match.light} 0%, ${match.color}88 100%)`
+                ? `radial-gradient(ellipse at 35% 35%, ${light} 0%, ${color}88 100%)`
                 : "transparent",
               border: "none", cursor: "pointer",
               fontFamily: "'Caveat', cursive", fontSize: 18, fontWeight: 700,
@@ -161,7 +156,7 @@ function MatchCard({ match, onStrike, struck }) {
             <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", overflow: "visible", pointerEvents: "none" }}>
               <rect x="2" y="2" width="calc(100% - 4px)" height="calc(100% - 4px)"
                 rx="8" fill="none"
-                stroke={struck ? match.color : "rgba(123,111,160,0.45)"} strokeWidth={struck ? "2.5" : "1.8"}
+                stroke={struck ? color : "rgba(123,111,160,0.45)"} strokeWidth={struck ? "2.5" : "1.8"}
                 style={{ filter: "url(#sketch)" }}
               />
             </svg>
@@ -169,26 +164,42 @@ function MatchCard({ match, onStrike, struck }) {
           </button>
         </div>
 
-        {/* Tags */}
+        {/* Tags — shared ones highlighted */}
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-          {match.tags.map(tag => (
-            <span key={tag} style={{
-              fontFamily: "'Caveat', cursive", fontSize: 13,
-              padding: "3px 10px",
-              background: `${match.color}33`,
-              color: "#5C4F8A", borderRadius: 20,
-              border: `1.5px solid ${match.color}88`,
-              filter: "url(#sketch)",
-            }}>{tag}</span>
-          ))}
+          {(match.tags || []).map(tag => {
+            const isShared = (match.sharedTags || []).includes(tag);
+            return (
+              <span key={tag} style={{
+                fontFamily: "'Caveat', cursive", fontSize: 13,
+                padding: "3px 10px",
+                background: isShared ? `${color}55` : `${color}22`,
+                color: isShared ? "#3a2f5e" : "#5C4F8A",
+                borderRadius: 20,
+                border: `1.5px solid ${isShared ? color : color + "55"}`,
+                filter: "url(#sketch)",
+                fontWeight: isShared ? 700 : 400,
+              }}>{tag}</span>
+            );
+          })}
         </div>
+
+        {/* Shared interests callout */}
+        {match.sharedTags?.length > 0 && (
+          <div style={{
+            fontFamily: "'Caveat', cursive", fontSize: 12,
+            color: palette.waterGreen, marginTop: 8, fontStyle: "italic",
+          }}>
+            ✦ {match.sharedTags.length} interest{match.sharedTags.length > 1 ? "s" : ""} in common
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
-// ── Struck confirmation modal ─────────────────────────────────────────────
-function StruckModal({ match, onClose, userName }) {
+// ── Strike confirmation modal ─────────────────────────────────────────────
+function StruckModal({ match, onClose }) {
+  const { color, light } = getColorPair(match.color);
   return (
     <div style={{
       position: "fixed", inset: 0, zIndex: 100,
@@ -197,27 +208,18 @@ function StruckModal({ match, onClose, userName }) {
       padding: "0 24px",
     }}>
       <div style={{ width: "100%", maxWidth: 380, animation: "popIn 0.4s ease" }}>
-        <WatercolorCard color={match.color} lightColor={match.light}>
+        <WatercolorCard color={color} lightColor={light}>
           <div style={{ textAlign: "center" }}>
             <div style={{ fontSize: 48, marginBottom: 8 }}>⚡</div>
-            <h2 style={{
-              fontFamily: "'Caveat', cursive", fontSize: 30, fontWeight: 700,
-              color: palette.inkBrown, margin: "0 0 8px",
-            }}>
+            <h2 style={{ fontFamily: "'Caveat', cursive", fontSize: 30, fontWeight: 700, color: palette.inkBrown, margin: "0 0 8px" }}>
               You struck {match.name}!
             </h2>
-            <p style={{
-              fontFamily: "'Caveat', cursive", fontSize: 16,
-              color: palette.softInk, opacity: 0.7, margin: "0 0 20px",
-              fontStyle: "italic", lineHeight: 1.5,
-            }}>
+            <p style={{ fontFamily: "'Caveat', cursive", fontSize: 16, color: palette.softInk, opacity: 0.7, margin: "0 0 20px", fontStyle: "italic", lineHeight: 1.5 }}>
               {match.name} will get a notification. If they strike back, you&apos;ll both get each other&apos;s contact info. ✦
             </p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              <SketchButton color={match.color} lightColor={match.light} onClick={onClose} wide>
-                Keep browsing →
-              </SketchButton>
-            </div>
+            <SketchButton color={color} lightColor={light} onClick={onClose} wide>
+              Keep browsing →
+            </SketchButton>
           </div>
         </WatercolorCard>
       </div>
@@ -225,47 +227,116 @@ function StruckModal({ match, onClose, userName }) {
   );
 }
 
-// ── Empty state ───────────────────────────────────────────────────────────
-function EmptyState() {
+// ── Loading skeleton ───────────────────────────────────────────────────────
+function LoadingSkeleton() {
   return (
-    <div style={{ textAlign: "center", padding: "40px 0" }}>
-      <div style={{ fontSize: 40, marginBottom: 12 }}>🌿</div>
-      <div style={{
-        fontFamily: "'Caveat', cursive", fontSize: 20, color: palette.inkBrown,
-        fontStyle: "italic", opacity: 0.6,
-      }}>
-        no one nearby right now...
-      </div>
-      <div style={{
-        fontFamily: "'Caveat', cursive", fontSize: 14, color: palette.softInk,
-        opacity: 0.4, marginTop: 6,
-      }}>
-        check back soon — the world is small
+    <div style={{ textAlign: "center", padding: "48px 0" }}>
+      <div style={{ fontSize: 36, marginBottom: 12, animation: "sporeFloat 1.5s ease-in-out infinite" }}>⚡</div>
+      <div style={{ fontFamily: "'Caveat', cursive", fontSize: 18, color: palette.inkBrown, fontStyle: "italic", opacity: 0.6 }}>
+        finding kindred spirits…
       </div>
     </div>
   );
 }
 
-// ── Main Connect Page ─────────────────────────────────────────────────────
+// ── Empty state ────────────────────────────────────────────────────────────
+function EmptyState({ onNavigate }) {
+  return (
+    <div style={{ textAlign: "center", padding: "40px 0" }}>
+      <div style={{ fontSize: 40, marginBottom: 12 }}>🌿</div>
+      <div style={{ fontFamily: "'Caveat', cursive", fontSize: 20, color: palette.inkBrown, fontStyle: "italic", opacity: 0.6 }}>
+        no one nearby right now...
+      </div>
+      <div style={{ fontFamily: "'Caveat', cursive", fontSize: 14, color: palette.softInk, opacity: 0.4, marginTop: 6, marginBottom: 20 }}>
+        try a wider radius or a different time
+      </div>
+      <SketchButton
+        color={palette.waterGold} lightColor={palette.waterGoldLight}
+        onClick={() => onNavigate("info")}
+        wide={false}
+      >
+        ← change my time
+      </SketchButton>
+    </div>
+  );
+}
+
+// ── Error state ────────────────────────────────────────────────────────────
+function ErrorState({ message, onRetry }) {
+  return (
+    <div style={{ textAlign: "center", padding: "40px 0" }}>
+      <div style={{ fontSize: 36, marginBottom: 12 }}>⚠️</div>
+      <div style={{ fontFamily: "'Caveat', cursive", fontSize: 16, color: palette.waterRose, fontStyle: "italic", marginBottom: 16 }}>
+        {message}
+      </div>
+      <SketchButton color={palette.waterGreen} lightColor={palette.waterGreenLight} onClick={onRetry}>
+        try again
+      </SketchButton>
+    </div>
+  );
+}
+
+// ── Main ConnectPage ───────────────────────────────────────────────────────
 export default function ConnectPage({ onNavigate, userInfo = {} }) {
-  const { name = "you", tags = [], time = "now" } = userInfo;
-  const [struckIds, setStruckIds] = useState([]);
+  const { id: userId, name = "you", tags = [], dateTime, lat, lng } = userInfo;
+
+  const [matches,     setMatches]     = useState([]);
+  const [loading,     setLoading]     = useState(true);
+  const [error,       setError]       = useState(null);
+  const [struckIds,   setStruckIds]   = useState([]);
   const [activeModal, setActiveModal] = useState(null);
 
-  // Filter matches to those sharing at least one tag
-  const matches = MOCK_MATCHES.filter(m =>
-    tags.length === 0 || m.tags.some(t => tags.includes(t))
-  ).concat(
-    // Always show at least some matches
-    MOCK_MATCHES.filter(m => !MOCK_MATCHES.filter(m => tags.length === 0 || m.tags.some(t => tags.includes(t))).includes(m)).slice(0, 2)
-  ).filter((m, i, arr) => arr.indexOf(m) === i);
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await fetchMatches({
+        lat,
+        lng,
+        dateTime,
+        tags,
+        radius: 2,
+        userId,
+      });
+      setMatches(data);
+    } catch (err) {
+      setError("couldn't reach the server — is the backend running on :3001?");
+    } finally {
+      setLoading(false);
+    }
+  }, [lat, lng, dateTime, tags, userId]);
 
-  const handleStrike = (id) => {
-    if (struckIds.includes(id)) return;
-    setStruckIds(prev => [...prev, id]);
-    const match = MOCK_MATCHES.find(m => m.id === id);
+  useEffect(() => { load(); }, [load]);
+
+  async function handleStrike(matchId) {
+    if (struckIds.includes(matchId)) return;
+    const match = matches.find(m => m.id === matchId);
+    if (!match) return;
+
+    // Optimistic UI update
+    setStruckIds(prev => [...prev, matchId]);
     setActiveModal(match);
-  };
+
+    try {
+      await sendNudge(userId, matchId);
+    } catch (err) {
+      // If it's already nudged from a prior session that's fine; anything else, revert
+      if (err.message !== "already_nudged") {
+        setStruckIds(prev => prev.filter(id => id !== matchId));
+        setActiveModal(null);
+      }
+    }
+  }
+
+  // Friendly label for the user's selected time
+  const timeLabel = (() => {
+    try {
+      return new Date(dateTime).toLocaleString("en-US", {
+        weekday: "short", month: "short", day: "numeric",
+        hour: "numeric", minute: "2-digit",
+      });
+    } catch { return dateTime || "now"; }
+  })();
 
   return (
     <PageShell blobs={BLOBS} spores={SPORES}>
@@ -273,31 +344,23 @@ export default function ConnectPage({ onNavigate, userInfo = {} }) {
 
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
-        <h1 style={{
-          fontFamily: "'Caveat', cursive", fontSize: 36, fontWeight: 700,
-          color: palette.inkBrown, margin: "0 0 6px", lineHeight: 1.15,
-        }}>
+        <h1 style={{ fontFamily: "'Caveat', cursive", fontSize: 36, fontWeight: 700, color: palette.inkBrown, margin: "0 0 6px", lineHeight: 1.15 }}>
           kindred spirits{" "}
           <span style={{ color: palette.waterGreen, fontStyle: "italic" }}>nearby</span>
         </h1>
-        <div style={{
-          fontFamily: "'Caveat', cursive", fontSize: 15,
-          color: palette.softInk, opacity: 0.65, fontStyle: "italic",
-          display: "flex", alignItems: "center", gap: 6,
-        }}>
+        <div style={{ fontFamily: "'Caveat', cursive", fontSize: 15, color: palette.softInk, opacity: 0.65, fontStyle: "italic", display: "flex", alignItems: "center", gap: 6 }}>
           <PulseRing color={palette.waterGreen} />
-          {matches.length} people free {time}
+          {loading ? "searching…" : `${matches.length} people free ${timeLabel}`}
           {tags.length > 0 && ` · into ${tags[0]}`}
         </div>
       </div>
 
-      {/* Your vibe summary badge */}
+      {/* Vibe summary badge */}
       <div style={{ position: "relative", padding: "10px 16px", marginBottom: 20, display: "inline-flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
         <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", overflow: "visible", pointerEvents: "none" }}>
           <rect x="2" y="2" width="calc(100% - 4px)" height="calc(100% - 4px)"
             rx="16" fill={`${palette.waterGoldLight}44`}
-            stroke={`${palette.waterGold}88`} strokeWidth="1.8"
-            style={{ filter: "url(#sketch)" }}
+            stroke={`${palette.waterGold}88`} strokeWidth="1.8" style={{ filter: "url(#sketch)" }}
           />
         </svg>
         <span style={{ fontFamily: "'Caveat', cursive", fontSize: 14, color: palette.softInk, opacity: 0.7 }}>
@@ -312,24 +375,39 @@ export default function ConnectPage({ onNavigate, userInfo = {} }) {
             filter: "url(#sketch)",
           }}>{t}</span>
         ))}
+        <button
+          onClick={load}
+          style={{
+            background: "none", border: "none", cursor: "pointer",
+            fontFamily: "'Caveat', cursive", fontSize: 13,
+            color: palette.waterGreen, opacity: 0.7,
+          }}
+        >
+          ↻ refresh
+        </button>
       </div>
 
       <SectionLabel>people nearby</SectionLabel>
 
-      {/* Match cards */}
-      {matches.length > 0 ? (
+      {/* Body */}
+      {loading ? (
+        <LoadingSkeleton />
+      ) : error ? (
+        <ErrorState message={error} onRetry={load} />
+      ) : matches.length === 0 ? (
+        <EmptyState onNavigate={onNavigate} />
+      ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {matches.map(match => (
-            <MatchCard
-              key={match.id}
-              match={match}
-              struck={struckIds.includes(match.id)}
-              onStrike={handleStrike}
-            />
+          {matches.map((match, i) => (
+            <div key={match.id} style={{ animationDelay: `${i * 0.08}s` }}>
+              <MatchCard
+                match={match}
+                struck={struckIds.includes(match.id) || match.nudged}
+                onStrike={handleStrike}
+              />
+            </div>
           ))}
         </div>
-      ) : (
-        <EmptyState />
       )}
 
       {/* Strikes sent summary */}
@@ -343,8 +421,7 @@ export default function ConnectPage({ onNavigate, userInfo = {} }) {
           <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", overflow: "visible", pointerEvents: "none" }}>
             <rect x="2" y="2" width="calc(100% - 4px)" height="calc(100% - 4px)"
               rx="12" fill={`${palette.waterGreenLight}44`}
-              stroke={`${palette.waterGreen}88`} strokeWidth="1.8"
-              style={{ filter: "url(#sketch)" }}
+              stroke={`${palette.waterGreen}88`} strokeWidth="1.8" style={{ filter: "url(#sketch)" }}
             />
           </svg>
           <span style={{ position: "relative", zIndex: 1 }}>
@@ -355,11 +432,9 @@ export default function ConnectPage({ onNavigate, userInfo = {} }) {
 
       <Footer />
 
-      {/* Modal */}
       {activeModal && (
         <StruckModal
           match={activeModal}
-          userName={name}
           onClose={() => setActiveModal(null)}
         />
       )}

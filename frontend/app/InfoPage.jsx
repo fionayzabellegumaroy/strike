@@ -7,6 +7,7 @@ import {
 import StepName from "./StepName";
 import StepTags from "./StepTags";
 import StepTime from "./StepTime";
+import { createProfile } from "./api.js";
 
 const BLOBS = (
   <>
@@ -30,7 +31,6 @@ const SPORES = [
   [300, 500, palette.waterGreen,    0.30, 2.5, 12],
 ];
 
-// ── Progress indicator ────────────────────────────────────────────────────
 function StepProgress({ step }) {
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 0, marginBottom: 28 }}>
@@ -58,15 +58,17 @@ function StepProgress({ step }) {
   );
 }
 
-// ── InfoPage ──────────────────────────────────────────────────────────────
-// Props:
-//   onNavigate  — called with ("connect", { name, tags, time }) when done
-//   initialStep — 0 | 1 | 2  (default 0; pass 1 after login to skip name step)
-//   initialName — pre-filled name from login (used when initialStep=1)
+// ── InfoPage ───────────────────────────────────────────────────────────────
+// When the user finishes StepTime, we:
+//  1. Request geolocation
+//  2. POST /profile → get back { id }
+//  3. Call onNavigate("connect", { name, tags, dateTime, id, lat, lng })
 export default function InfoPage({ onNavigate, initialStep = 0, initialName = "" }) {
   const [step, setStep]   = useState(initialStep);
   const [name, setName]   = useState(initialName);
   const [tags, setTags]   = useState([]);
+  const [submitting, setSubmitting] = useState(false);
+  const [geoError,   setGeoError]   = useState("");
 
   const handleBack = () => {
     if (step === 0 || (step === 1 && initialStep === 1)) {
@@ -75,6 +77,48 @@ export default function InfoPage({ onNavigate, initialStep = 0, initialName = ""
       setStep(s => s - 1);
     }
   };
+
+  // Called by StepTime with { name, tags, dateTime }
+  async function handleDone({ name: n, tags: t, dateTime }) {
+    setSubmitting(true);
+    setGeoError("");
+
+    try {
+      // 1. Get coordinates
+      const coords = await new Promise((resolve, reject) =>
+        navigator.geolocation.getCurrentPosition(
+          pos => resolve(pos.coords),
+          ()  => reject(new Error("Location access denied — please enable it to find nearby people."))
+        )
+      );
+
+      // 2. POST profile to backend
+      const { id } = await createProfile({
+        name:         n,
+        avatar:       "⚡",
+        lat:          coords.latitude,
+        lng:          coords.longitude,
+        // Store as ISO string; backend will parse for ±2h window matching
+        availability: dateTime.toISOString(),
+        tags:         t,
+        color:        palette.waterRose,
+        light:        palette.waterRoseLight,
+      });
+
+      // 3. Navigate to matches, passing everything ConnectPage needs
+      onNavigate("connect", {
+        id,
+        name:     n,
+        tags:     t,
+        dateTime: dateTime.toISOString(),
+        lat:      coords.latitude,
+        lng:      coords.longitude,
+      });
+    } catch (err) {
+      setGeoError(err.message || "Something went wrong — please try again.");
+      setSubmitting(false);
+    }
+  }
 
   return (
     <PageShell blobs={BLOBS} spores={SPORES}>
@@ -101,13 +145,32 @@ export default function InfoPage({ onNavigate, initialStep = 0, initialName = ""
       )}
 
       {step === 2 && (
-        <StepTime
-          name={name}
-          tags={tags}
-          onDone={({ name: n, tags: t, time }) => {
-            onNavigate("connect", { name: n, tags: t, time });
-          }}
-        />
+        <>
+          <StepTime
+            name={name}
+            tags={tags}
+            onDone={handleDone}
+            disabled={submitting}
+          />
+          {submitting && (
+            <div style={{
+              fontFamily: "'Caveat', cursive", fontSize: 15,
+              color: palette.softInk, textAlign: "center",
+              opacity: 0.65, marginTop: 12, fontStyle: "italic",
+            }}>
+              📍 getting your location & finding people…
+            </div>
+          )}
+          {geoError && (
+            <div style={{
+              fontFamily: "'Caveat', cursive", fontSize: 14,
+              color: palette.waterRose, fontStyle: "italic",
+              marginTop: 12, textAlign: "center",
+            }}>
+              ✦ {geoError}
+            </div>
+          )}
+        </>
       )}
 
       <Footer />

@@ -110,7 +110,7 @@ function RegisterCard({ onBack, onNavigate }) {
         color: palette.inkBrown, textAlign: "center", marginBottom: 20, fontStyle: "italic",
       }}>Welcome back ✦</div>
       <SketchInput label="College email" placeholder="you@university.edu" value={email} onChange={e => { setEmail(e.target.value); setError(""); }} type="email" />
-      <SketchInput label="Password" placeholder="••••••••" value={password} onChange={e => { setPassword(e.target.value); setError(""); }} type="password" />
+      <SketchInput laabel="Password" placeholder="••••••••" value={password} onChange={e => { setPassword(e.target.value); setError(""); }} type="password" />
       {error && (
         <div style={{
           fontFamily: "'Caveat', cursive", fontSize: 14,
