@@ -4,6 +4,7 @@ import LandingPage from "./LandingPage.jsx";
 import InfoPage    from "./InfoPage.jsx";
 import ConnectPage from "./ConnectPage.jsx";
 import Register    from "./Register.jsx";
+import HomePage    from "./HomePage.jsx";
 
 export default function App() {
   const [page, setPage]         = useState("landing");
@@ -38,6 +39,7 @@ export default function App() {
   }
   if (page === "connect")  return <ConnectPage onNavigate={navigate} userInfo={userInfo} />;
   if (page === "register") return <Register    onNavigate={navigate} />;
+  if (page === "home") return <HomePage    onNavigate={navigate} />;
 
   return <LandingPage onNavigate={navigate} />;
 }

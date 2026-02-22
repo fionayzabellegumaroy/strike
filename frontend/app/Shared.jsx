@@ -187,7 +187,7 @@ export function PageShell({ children, blobs, spores }) {
   );
 }
 
-export function SketchButton({ children, color, lightColor, onClick, wide = false, disabled = false }) {
+export function SketchButton({ children, color = palette.waterBlue, lightColor = palette.waterBlueLight, onClick, wide = false, disabled = false, active = false }) {
   const [hovered, setHovered] = useState(false);
   return (
     <button
@@ -201,7 +201,7 @@ export function SketchButton({ children, color, lightColor, onClick, wide = fals
         width: wide ? "100%" : "auto",
         background: disabled
           ? "rgba(200,200,200,0.15)"
-          : hovered
+          : (hovered || active)
             ? `radial-gradient(ellipse at 40% 40%, ${lightColor} 0%, ${color}88 100%)`
             : `radial-gradient(ellipse at 40% 40%, ${lightColor}55 0%, ${color}33 100%)`,
         border: "none", cursor: disabled ? "not-allowed" : "pointer",
