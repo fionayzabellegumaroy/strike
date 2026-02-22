@@ -14,10 +14,11 @@ export const palette = {
   waterGoldLight:     "#FAF0C0",
   waterLavender:      "#C798C1",
   waterLavenderLight: "#FBDBF3",
+  ink:                "#33316e",
 };
 
 export const animationCSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Covered+By+Your+Grace&family=Inconsolata:wght@200..900&family=Yusei+Magic&display=swap');
 
   @keyframes blobDrift0 {
     0%   { transform: translate(0px,0px) scale(1) rotate(0deg); }
@@ -88,7 +89,7 @@ export const animationCSS = `
   }
   @keyframes dotPulse {
     0%,100% { transform: scale(1); opacity: 0.6; }
-    50%     { transform: scale(1.35); opacity: 1; }
+    50%     { transform: scale(1.35); opacity: 8; }
   }
   @keyframes tagPop {
     0%   { opacity: 0; transform: scale(0.7) rotate(-4deg); }
@@ -204,16 +205,16 @@ export function SketchButton({ children, color, lightColor, onClick, wide = fals
             ? `radial-gradient(ellipse at 40% 40%, ${lightColor} 0%, ${color}88 100%)`
             : `radial-gradient(ellipse at 40% 40%, ${lightColor}55 0%, ${color}33 100%)`,
         border: "none", cursor: disabled ? "not-allowed" : "pointer",
-        fontFamily: "'Caveat', cursive", fontSize: "19px", fontWeight: 700,
+        fontFamily: "'Yusei Magic', sans-serif", fontSize: "15px", fontWeight: 700,
         color: disabled ? "#aaa" : "#3a2f5e",
         transform: hovered && !disabled ? "rotate(-0.4deg) scale(1.02)" : "rotate(0.2deg)",
-        transition: "all 0.2s ease", outline: "none", borderRadius: 2,
+        transition: "all 0.2s ease", outline: "none", borderRadius: 16,
         letterSpacing: "0.02em", opacity: disabled ? 0.5 : 1,
       }}
     >
       <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", overflow: "visible", pointerEvents: "none" }}>
         <rect x="2" y="2" width="calc(100% - 4px)" height="calc(100% - 4px)"
-          rx="8" fill="none" stroke={disabled ? "#ccc" : "#5C4F8A"} strokeWidth="2.2"
+          rx="16" fill="none" stroke={disabled ? "#ccc" : "#5C4F8A"} strokeWidth="2.2"
           strokeLinejoin="round" strokeLinecap="round" style={{ filter: "url(#sketch)" }}
         />
       </svg>
@@ -228,11 +229,17 @@ export function SketchInput({ placeholder, value, onChange, type = "text", label
     <div style={{ position: "relative", width: "100%", marginBottom: 16 }}>
       {label && (
         <div style={{
-          fontFamily: "'Caveat', cursive", fontSize: 13, color: palette.softInk,
+          fontFamily: "'Inconsolata', monospace", fontSize: 13, color: palette.softInk,
           opacity: 0.55, letterSpacing: "0.10em", textTransform: "uppercase",
           marginBottom: 4, paddingLeft: 2,
         }}>{label}</div>
       )}
+      <style>{`
+        input::placeholder {
+          color: #C798C1;
+          opacity: 0.8;
+        }
+      `}</style>
       <input
         value={value} onChange={onChange} placeholder={placeholder} type={type}
         onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}
@@ -241,11 +248,11 @@ export function SketchInput({ placeholder, value, onChange, type = "text", label
           background: focused ? `${palette.waterBlueLight}44` : "transparent",
           border: "none",
           borderBottom: `2.5px solid ${hasError ? palette.waterRose : focused ? palette.waterBlue : "rgba(123,111,160,0.9)"}`,
-          fontFamily: "'Caveat', cursive", fontSize: "17px",
-          color: palette.inkBrown, outline: "none",
+          fontFamily: "'Inconsolata', monospace", fontSize: "17px",
+          color: "#b16296", outline: "none",
           transition: "all 0.2s ease",
           borderRadius: focused ? "4px 4px 0 0" : "0",
-          boxSizing: "border-box", filter: "url(#sketch)",
+          boxSizing: "border-box",
         }}
       />
     </div>
@@ -293,15 +300,16 @@ export function TopBar({ onBack, title }) {
       {onBack ? (
         <button onClick={onBack} style={{
           background: "none", border: "none", cursor: "pointer",
-          fontFamily: "'Caveat', cursive", fontSize: 16,
+          fontFamily: "'Inconsolata', monospace", fontSize: 16,
           color: palette.waterGreen, fontWeight: 700,
         }}>← Back</button>
       ) : <div style={{ width: 60 }} />}
       <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-        <span style={{
-          fontFamily: "'Caveat', cursive", fontSize: 28, fontWeight: 700,
-          color: palette.inkBrown, letterSpacing: "-0.01em", fontStyle: "italic",
-        }}>strike</span>
+        <img
+          src={require("../assets/images/logo.png").uri}
+          alt="Strike"
+          style={{ width: 100, height: 100, objectFit: "contain" }}
+        />
         <div style={{
           width: 7, height: 7, borderRadius: "50%",
           background: palette.waterRose, marginBottom: 2,
@@ -309,7 +317,7 @@ export function TopBar({ onBack, title }) {
         }} />
       </div>
       {title ? (
-        <div style={{ fontFamily: "'Caveat', cursive", fontSize: 13, color: palette.softInk, opacity: 0.5 }}>{title}</div>
+        <div style={{ fontFamily: "'Yusei Magic', sans-serif", fontSize: 13, color: palette.softInk, opacity: 0.5 }}>{title}</div>
       ) : <div style={{ width: 60 }} />}
     </div>
   );
@@ -318,8 +326,8 @@ export function TopBar({ onBack, title }) {
 export function SectionLabel({ children }) {
   return (
     <div style={{
-      fontFamily: "'Caveat', cursive", fontSize: 13, color: "#7B6FA0",
-      opacity: 0.5, letterSpacing: "0.12em", textTransform: "uppercase",
+      fontFamily: "'Yusei Magic', sans-serif", fontSize: 11, color: "#b16296",
+      opacity: 0.7, letterSpacing: "0.12em", textTransform: "uppercase",
       marginBottom: 12, paddingLeft: 2,
     }}>{children} ˖°</div>
   );
@@ -329,10 +337,12 @@ export function Footer() {
   return (
     <div style={{
       marginTop: 44, textAlign: "center",
-      fontFamily: "'Caveat', cursive", fontSize: 14,
-      color: "#7B6FA0", opacity: 0.4, fontStyle: "italic",
+      fontFamily: "'Yusei Magic', sans-serif", fontSize: 14,
+      color: "#a6c1dc", opacity: 1, fontStyle: "italic",
     }}>
       ~ safe · local · spontaneous ~
     </div>
   );
 }
+
+export default function Shared() { return null; }

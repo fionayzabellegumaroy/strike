@@ -1,9 +1,15 @@
 // ── LandingPage.jsx ───────────────────────────────────────────────────────
 import { useState } from "react";
+import React from 'react';
+const logoName = require("../assets/images/logoName.png");
+console.log("logo:", logoName);
+
 import {
   palette, PageShell, WatercolorBlob, SketchButton,
   SketchInput, WatercolorCard, Footer, SectionLabel,
 } from "./Shared.jsx";
+
+
 
 // ── Blobs for landing ─────────────────────────────────────────────────────
 const BLOBS = (
@@ -33,25 +39,15 @@ const SPORES = [
 // ── Wordmark with lightning-bolt logo ────────────────────────────────────
 function Wordmark() {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 36 }}>
-      <svg width="56" height="56" viewBox="0 0 48 48" style={{ filter: "url(#roughBorder)" }}>
-        <circle cx="24" cy="24" r="18" fill={`${palette.waterGold}66`} stroke="rgba(123,111,160,1)" strokeWidth="2.5"/>
-        <path d="M26 11 L18 25 L23 25 L20 37 L30 21 L25 21 Z"
-          fill={palette.waterGold} stroke="rgba(123,111,160,1)" strokeWidth="1.2" strokeLinejoin="round"
-        />
-      </svg>
-      <div>
-        <span style={{
-          fontFamily: "'Caveat', cursive", fontSize: 34, fontWeight: 700,
-          color: palette.inkBrown, letterSpacing: "-0.01em", fontStyle: "italic",
-        }}>strike</span>
-        <div style={{
-          width: 8, height: 8, borderRadius: "50%", background: palette.waterRose,
-          display: "inline-block", marginLeft: 4, marginBottom: 6,
-          verticalAlign: "bottom", filter: "url(#sketch)",
-        }} />
-      </div>
+    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 25 }}>
+      <img
+        src={logoName.uri}
+        alt="Strike"
+        style={{ width: 100, height: 100 }}
+      /> 
+      
     </div>
+  
   );
 }
 
@@ -61,16 +57,16 @@ function VerifyBadge() {
     <div style={{
       position: "relative", display: "inline-flex", alignItems: "center",
       gap: 8, padding: "8px 20px",
-      fontFamily: "'Caveat', cursive", fontSize: 15, color: "#3a2f5e",
+      fontFamily: "'Yusei Magic', sans-serif", fontSize: 12, color: "#3a2f5e",
     }}>
       <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", overflow: "visible", pointerEvents: "none" }}>
         <rect x="2" y="2" width="calc(100% - 4px)" height="calc(100% - 4px)"
-          rx="20" fill={`${palette.waterGold}44`}
-          stroke="rgba(123,111,160,0.7)" strokeWidth="1.8" style={{ filter: "url(#sketch)" }}
+          rx="20" fill={`${palette.waterGreen}44`}
+          stroke="palette.softInk" strokeWidth="1.8" style={{ filter: "url(#sketch)" }}
         />
       </svg>
       <span>🎓</span>
-      <span style={{ position: "relative", zIndex: 1 }}>College students only · .edu verified</span>
+      <span style={{ position: "relative", zIndex: 1 }}>College students only  .edu verified</span>
     </div>
   );
 }
@@ -106,14 +102,14 @@ function LoginCard({ onBack, onNavigate }) {
   return (
     <WatercolorCard color={palette.waterRose} lightColor={palette.waterRoseLight}>
       <div style={{
-        fontFamily: "'Caveat', cursive", fontSize: 22, fontWeight: 700,
-        color: palette.inkBrown, textAlign: "center", marginBottom: 20, fontStyle: "italic",
+        fontFamily: "'Yusei Magic', sans-serif", fontSize: 22, fontWeight: 700,
+        color: palette.inkBrown, textAlign: "center", marginBottom: 20,
       }}>Welcome back ✦</div>
       <SketchInput label="College email" placeholder="you@university.edu" value={email} onChange={e => { setEmail(e.target.value); setError(""); }} type="email" />
       <SketchInput label="Password" placeholder="••••••••" value={password} onChange={e => { setPassword(e.target.value); setError(""); }} type="password" />
       {error && (
         <div style={{
-          fontFamily: "'Caveat', cursive", fontSize: 14,
+          fontFamily: "'Yusei Magic', sans-serif", fontSize: 14,
           color: palette.waterRose, fontStyle: "italic", marginBottom: 8,
         }}>
           ✦ {error}
@@ -131,7 +127,7 @@ function LoginCard({ onBack, onNavigate }) {
         justifyContent: "space-between",
         // gap: 40, // space between them
         marginTop: 14,
-        fontFamily: "'Caveat', cursive",
+        fontFamily: "'Yusei Magic', sans-serif",
         fontSize: 13,
         color: palette.softInk,
         opacity: 0.5,
@@ -167,15 +163,15 @@ export default function LandingPage({ onNavigate }) {
       {/* Headline */}
       <div style={{ textAlign: "center", marginBottom: 24 }}>
         <h1 style={{
-          fontFamily: "'Caveat', cursive", fontSize: 46, fontWeight: 700,
-          color: palette.inkBrown, margin: "0 0 12px", lineHeight: 1.12, letterSpacing: "-0.01em",
+          fontFamily: "'Yusei Magic', sans-serif", fontSize: 46, fontWeight: 700,
+          color: palette.ink, margin: "0 0 12px", lineHeight: 1.12, letterSpacing: "-0.01em",
         }}>
           Find your people,{" "}
-          <span style={{ color: palette.waterGreen, fontStyle: "italic" }}>right now.</span>
+          <span style={{ color: palette.waterBlue, fontStyle: "italic" }}>right now.</span>
         </h1>
         <p style={{
-          fontFamily: "'Caveat', cursive", fontSize: 17, color: palette.softInk,
-          opacity: 0.7, margin: 0, lineHeight: 1.5, fontStyle: "italic",
+          fontFamily: "'Inconsolata', monospace", fontSize: 15, color: palette.softInk,
+          opacity: 0.7, margin: 0, lineHeight: 1.5,
         }}>
           Real hangouts with verified students near you — no feeds, just plans.
         </p>
@@ -191,8 +187,8 @@ export default function LandingPage({ onNavigate }) {
       {!showLogin ? (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <SketchButton
-            color={palette.waterGreen}
-            lightColor={palette.waterGreenLight}
+            color={palette.waterGold}
+            lightColor={palette.waterGold}
             onClick={() => onNavigate("verify")}
             wide
           >

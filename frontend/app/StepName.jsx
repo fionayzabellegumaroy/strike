@@ -17,28 +17,28 @@ export default function StepName({ onNext }) {
   return (
     <WatercolorCard color={palette.waterBlue} lightColor={palette.waterBlueLight}>
       <h2 style={{
-        fontFamily: "'Caveat', cursive", fontSize: 32, fontWeight: 700,
-        color: palette.inkBrown, margin: "0 0 8px", lineHeight: 1.2,
+        fontFamily: "'Yusei Magic', sans-serif", fontSize: 32, fontWeight: 700,
+        color: palette.ink, margin: "0 0 8px", lineHeight: 1.2,
       }}>
         First, what&apos;s your{" "}
         <span style={{ color: palette.waterBlue, fontStyle: "italic" }}>name?</span>
       </h2>
       <p style={{
-        fontFamily: "'Caveat', cursive", fontSize: 15, color: palette.softInk,
-        opacity: 0.65, margin: "0 0 20px", fontStyle: "italic",
+        fontFamily: "'Inconsolata', monospace", fontSize: 15, color: palette.softInk,
+        opacity: 0.65, margin: "0 0 20px",
       }}>
         This is how you&apos;ll appear to others nearby.
       </p>
       <SketchInput
-        label="Your first name"
-        placeholder="e.g. Maya"
+        //label="Your first name"
+        placeholder="Your first name"
         value={name}
         onChange={e => { setName(e.target.value); setNameError(""); }}
         hasError={!!nameError}
       />
       {nameError && (
         <div style={{
-          fontFamily: "'Caveat', cursive", fontSize: 14,
+          fontFamily: "'Inconsolata', monospace", fontSize: 14,
           color: palette.waterRose, fontStyle: "italic", marginBottom: 8,
         }}>
           ✦ {nameError}

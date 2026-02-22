@@ -36,7 +36,7 @@ function TagPill({ tag, selected, onClick, animDelay }) {
         position: "relative",
         padding: "7px 16px",
         cursor: "pointer",
-        fontFamily: "'Caveat', cursive", fontSize: 15, fontWeight: 600,
+        fontFamily: "'Yusei Magic', sans-serif", fontSize: 13, fontWeight: 600,
         color: selected ? "#3a2f5e" : "rgba(91,78,138,0.55)",
         background: selected
           ? `radial-gradient(ellipse at 35% 35%, ${tag.light} 0%, ${tag.color}66 100%)`
@@ -45,7 +45,7 @@ function TagPill({ tag, selected, onClick, animDelay }) {
           ? "rotate(-0.5deg) scale(1.04)"
           : hovered ? "scale(1.02)" : "scale(1)",
         transition: "all 0.2s ease",
-        borderRadius: 2,
+        borderRadius: 16,
         animation: `tagPop 0.4s ease ${animDelay}s both`,
       }}
     >
@@ -55,7 +55,7 @@ function TagPill({ tag, selected, onClick, animDelay }) {
       }}>
         <rect x="2" y="2" width="calc(100% - 4px)" height="calc(100% - 4px)"
           rx="20" fill="none"
-          stroke={selected ? "#5C4F8A" : "rgba(123,111,160,0.3)"}
+          stroke={selected ? palette.softInk : "rgba(123,111,160,0.3)"}
           strokeWidth={selected ? "2" : "1.5"}
           style={{ filter: "url(#sketch)" }}
         />
@@ -80,15 +80,15 @@ export default function StepTags({ name, onNext }) {
   return (
     <div style={{ animation: "fadeSlideUp 0.4s ease" }}>
       <h2 style={{
-        fontFamily: "'Caveat', cursive", fontSize: 32, fontWeight: 700,
+        fontFamily: "'Yusei Magic', sans-serif", fontSize: 32, fontWeight: 700,
         color: palette.inkBrown, margin: "0 0 6px", lineHeight: 1.2,
       }}>
         Hey {name}! What are you{" "}
         <span style={{ color: palette.waterRose, fontStyle: "italic" }}>into?</span>
       </h2>
       <p style={{
-        fontFamily: "'Caveat', cursive", fontSize: 15, color: palette.softInk,
-        opacity: 0.65, margin: "0 0 20px", fontStyle: "italic",
+        fontFamily: "'Inconsolata', monospace", fontSize: 15, color: palette.softInk,
+        opacity: 0.65, margin: "0 0 20px",
       }}>
         Pick up to 5 vibes — we&apos;ll find people who match.
       </p>
@@ -128,7 +128,7 @@ export default function StepTags({ name, onNext }) {
       </div>
 
       <div style={{
-        fontFamily: "'Caveat', cursive", fontSize: 13, color: palette.softInk,
+        fontFamily: "'Inconsolata', monospace", fontSize: 13, color: palette.softInk,
         opacity: 0.45, textAlign: "center", marginBottom: 16,
       }}>
         {selectedTags.length}/5 selected

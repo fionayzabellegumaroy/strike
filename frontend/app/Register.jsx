@@ -42,7 +42,7 @@ function Wordmark() {
       </svg>
       <div>
         <span style={{
-          fontFamily: "'Caveat', cursive", fontSize: 34, fontWeight: 700,
+          fontFamily: "'Yusei Magic', sans-serif", fontSize: 34, fontWeight: 700,
           color: palette.inkBrown, letterSpacing: "-0.01em", fontStyle: "italic",
         }}>strike</span>
         <div style={{
@@ -61,7 +61,7 @@ function VerifyBadge() {
     <div style={{
       position: "relative", display: "inline-flex", alignItems: "center",
       gap: 8, padding: "8px 20px",
-      fontFamily: "'Caveat', cursive", fontSize: 15, color: "#3a2f5e",
+      fontFamily: "'Yusei Magic', sans-serif", fontSize: 15, color: "#3a2f5e",
     }}>
       <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", overflow: "visible", pointerEvents: "none" }}>
         <rect x="2" y="2" width="calc(100% - 4px)" height="calc(100% - 4px)"
@@ -106,14 +106,14 @@ function RegisterCard({ onBack, onNavigate }) {
   return (
     <WatercolorCard color={palette.waterRose} lightColor={palette.waterRoseLight}>
       <div style={{
-        fontFamily: "'Caveat', cursive", fontSize: 22, fontWeight: 700,
+        fontFamily: "'Yusei Magic', sans-serif", fontSize: 22, fontWeight: 700,
         color: palette.inkBrown, textAlign: "center", marginBottom: 20, fontStyle: "italic",
       }}>Welcome back ✦</div>
       <SketchInput label="College email" placeholder="you@university.edu" value={email} onChange={e => { setEmail(e.target.value); setError(""); }} type="email" />
       <SketchInput laabel="Password" placeholder="••••••••" value={password} onChange={e => { setPassword(e.target.value); setError(""); }} type="password" />
       {error && (
         <div style={{
-          fontFamily: "'Caveat', cursive", fontSize: 14,
+          fontFamily: "'Yusei Magic', sans-serif", fontSize: 14,
           color: palette.waterRose, fontStyle: "italic", marginBottom: 8,
         }}>
           ✦ {error}

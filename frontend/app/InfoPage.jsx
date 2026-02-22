@@ -39,8 +39,8 @@ function StepProgress({ step }) {
           <div style={{
             width: i === step ? 22 : 10, height: 10,
             borderRadius: i === step ? 5 : "50%",
-            background: i <= step ? palette.waterGreen : "rgba(163,201,136,0.25)",
-            border: `1.5px solid ${i <= step ? palette.waterGreen : "rgba(163,201,136,0.4)"}`,
+            background: i <= step ? palette.waterBlue : palette.waterBlueLight,
+            border: `1.5px solid ${i <= step ? palette.waterBlue : palette.waterBlueLight}`,
             transition: "all 0.4s ease",
             animation: i === step ? "dotPulse 2s ease-in-out infinite" : "none",
             filter: i === step ? "url(#sketch)" : "none",
@@ -48,7 +48,7 @@ function StepProgress({ step }) {
           {i < 2 && (
             <div style={{
               width: 32, height: 2,
-              background: i < step ? `${palette.waterGreen}88` : "rgba(163,201,136,0.2)",
+              background: i < step ? `${palette.waterBlue}88` : palette.waterBlueLight,
               margin: "0 4px", transition: "background 0.4s ease",
             }} />
           )}

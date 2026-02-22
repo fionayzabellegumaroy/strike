@@ -133,13 +133,13 @@ function TimePill({ label, selected, onClick }) {
       onMouseLeave={() => setHovered(false)}
       style={{
         position: "relative", padding: "8px 18px", cursor: "pointer",
-        fontFamily: "'Caveat', cursive", fontSize: 15, fontWeight: 600,
+        fontFamily: "'Yusei Magic', sans-serif", fontSize: 15, fontWeight: 600,
         color: selected ? "#3a2f5e" : "rgba(91,78,138,0.5)",
         background: selected
-          ? `radial-gradient(ellipse at 35% 35%, ${palette.waterGreenLight} 0%, ${palette.waterGreen}55 100%)`
+          ? `radial-gradient(ellipse at 35% 35%, ${palette.waterGreenLight} 0%, ${palette.waterBlue}55 100%)`
           : hovered ? `${palette.waterGreenLight}44` : "transparent",
         transform: selected ? "rotate(-0.3deg) scale(1.04)" : "scale(1)",
-        transition: "all 0.2s ease", borderRadius: 2,
+        transition: "all 0.2s ease", borderRadius: 16,
       }}
     >
       <svg style={{
@@ -206,14 +206,14 @@ export default function StepTime({ name, tags, onDone }) {
   return (
     <WatercolorCard color={palette.waterGreen} lightColor={palette.waterGreenLight}>
       <h2 style={{
-        fontFamily: "'Caveat', cursive", fontSize: 32, fontWeight: 700,
-        color: palette.inkBrown, margin: "0 0 6px", lineHeight: 1.2,
+        fontFamily: "'Yusei Magic', sans-serif", fontSize: 32, fontWeight: 700,
+        color: palette.ink, margin: "0 0 6px", lineHeight: 1.2,
       }}>
         When are you{" "}
-        <span style={{ color: palette.waterGreen, fontStyle: "italic" }}>free?</span>
+        <span style={{ color: palette.inkBrown, fontStyle: "italic" }}>free?</span>
       </h2>
       <p style={{
-        fontFamily: "'Caveat', cursive", fontSize: 15, color: palette.softInk,
+        fontFamily: "'Inconsolata', monospace", fontSize: 15, color: palette.softInk,
         opacity: 0.65, margin: "0 0 20px", fontStyle: "italic",
       }}>
         We&apos;ll only show you people who are free at the same time.
