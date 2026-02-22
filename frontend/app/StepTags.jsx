@@ -19,6 +19,9 @@ const ALL_TAGS = [
   { label: "🐾 pets",         color: palette.waterGreen,    light: palette.waterGreenLight },
   { label: "✈️ travel",       color: palette.waterRose,     light: palette.waterRoseLight },
   { label: "💻 tech",         color: palette.waterBlue,     light: palette.waterBlueLight },
+  { label: "🏋️ gym",       color: palette.waterGold,     light: palette.waterGoldLight },
+  { label: "🎉 club",     color: palette.waterBlue,     light: palette.waterBlueLight },
+  { label: "🎨 bar",          color: palette.waterRose,     light: palette.waterRoseLight }
 ];
 
 // ── Selectable tag pill ───────────────────────────────────────────────────
