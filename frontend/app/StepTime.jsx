@@ -58,12 +58,18 @@ function Calendar({ selectedDate, onSelectDate }) {
           justify-content: space-between;
           align-items: center;
           margin-bottom: 12px;
+          font-family: 'Yusei Magic', sans-serif;
+          font-size: 16px;
+          color: #33316e;
         }
 
         .cal-grid {
           display: grid;
           grid-template-columns: repeat(7, 1fr);
           gap: 6px;
+          font-family: 'Yusei Magic', sans-serif;
+          font-size: 16px;
+          color: #33316e;
         }
 
         .cal-day {
@@ -73,8 +79,9 @@ function Calendar({ selectedDate, onSelectDate }) {
           align-items: center;
           cursor: pointer;
           border-radius: 8px;
-          font-family: 'Caveat', cursive;
+          font-family: 'Yusei Magic', sans-serif;
           font-size: 16px;
+          color: #7B6FA0;
         }
 
         .cal-day:hover {
@@ -86,7 +93,7 @@ function Calendar({ selectedDate, onSelectDate }) {
         }
 
         .selected-day {
-          background: black;
+          background: #7B6FA0 ;
           color: white;
         }
       `}</style>
@@ -214,7 +221,7 @@ export default function StepTime({ name, tags, onDone }) {
       </h2>
       <p style={{
         fontFamily: "'Inconsolata', monospace", fontSize: 15, color: palette.softInk,
-        opacity: 0.65, margin: "0 0 20px", fontStyle: "italic",
+        opacity: 0.65, margin: "0 0 20px", 
       }}>
         We&apos;ll only show you people who are free at the same time.
       </p>
@@ -230,10 +237,10 @@ export default function StepTime({ name, tags, onDone }) {
           gap: 10,
           marginBottom: 20,
           marginTop: 15,
-          fontFamily: "'Caveat', cursive",
+          fontFamily: "'Yusei Magic', sans-serif",
         }}
       >
-        <span style={{ fontSize: 16 }}>Time:</span>
+        <span style={{ fontSize: 16, color: "#33316e"  }}>Time:</span>
 
         <input
           type="time"
@@ -245,7 +252,7 @@ export default function StepTime({ name, tags, onDone }) {
             borderRadius: 8,
             border: "1px solid rgba(0,0,0,0.2)",
             background: "white",
-            fontFamily: "'Caveat', cursive",
+            fontFamily: "'Yusei Magic', sans-serif",
             cursor: "pointer",
           }}
         />

@@ -126,7 +126,7 @@ function RegisterCard({ onBack, onNavigate }) {
         <SketchButton color={palette.waterBlue} lightColor={palette.waterBlueLight} onClick={onBack} wide>← Back</SketchButton>
       </div>
       <div style={{
-        textAlign: "center", marginTop: 14, fontFamily: "'Caveat', cursive",
+        textAlign: "center", marginTop: 14, fontFamily: "'Yusei Magic', sans-serif",
         fontSize: 13, color: palette.softInk, opacity: 0.5, cursor: "pointer", textDecoration: "underline",
       }}>
       </div>
@@ -145,14 +145,14 @@ export default function Register({ onNavigate }) {
       {/* Headline */}
       <div style={{ textAlign: "center", marginBottom: 24 }}>
         <h1 style={{
-          fontFamily: "'Caveat', cursive", fontSize: 46, fontWeight: 700,
+          fontFamily: "'Yusei Magic', sans-serif", fontSize: 46, fontWeight: 700,
           color: palette.inkBrown, margin: "0 0 12px", lineHeight: 1.12, letterSpacing: "-0.01em",
         }}>
           Find your people,{" "}
           <span style={{ color: palette.waterGreen, fontStyle: "italic" }}>right now.</span>
         </h1>
         <p style={{
-          fontFamily: "'Caveat', cursive", fontSize: 17, color: palette.softInk,
+          fontFamily: "'Yusei Magic', sans-serif", fontSize: 17, color: palette.softInk,
           opacity: 0.7, margin: 0, lineHeight: 1.5, fontStyle: "italic",
         }}>
           Real hangouts with verified students near you — no feeds, just plans.

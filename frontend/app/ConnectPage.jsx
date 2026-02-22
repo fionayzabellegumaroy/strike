@@ -123,31 +123,15 @@ function MatchCard({ match, onStrike, struck }) {
               width: 48, height: 48, borderRadius: "50%",
               background: `radial-gradient(ellipse at 35% 35%, ${light} 0%, ${color}88 100%)`,
               display: "flex", alignItems: "center", justifyContent: "center",
-<<<<<<< Updated upstream
               fontSize: 22, filter: "url(#roughBorder)", flexShrink: 0,
-=======
-              fontSize: 22, 
-              flexShrink: 0,
->>>>>>> Stashed changes
             }}>
               {match.avatar || "⚡"}
             </div>
             <div>
-<<<<<<< Updated upstream
               <div style={{ fontFamily: "'Caveat', cursive", fontSize: 22, fontWeight: 700, color: palette.inkBrown, lineHeight: 1.1 }}>
                 {match.name}
               </div>
               <div style={{ fontFamily: "'Caveat', cursive", fontSize: 13, color: palette.softInk, opacity: 0.6, display: "flex", alignItems: "center" }}>
-=======
-              <div style={{
-                fontFamily: "'Yusei Magic', sans-serif", fontSize: 22, fontWeight: 700,
-                color: palette.inkBrown, lineHeight: 1.1,
-              }}>{match.name}</div>
-              <div style={{
-                fontFamily: "'Inconsolata', monospace", fontSize: 13,
-                color: palette.softInk, opacity: 0.6, display: "flex", alignItems: "center",
-              }}>
->>>>>>> Stashed changes
                 <PulseRing color={palette.waterGreen} />
                 {availLabel} · {match.distanceLabel} away
               </div>
@@ -163,9 +147,9 @@ function MatchCard({ match, onStrike, struck }) {
                 ? `radial-gradient(ellipse at 35% 35%, ${light} 0%, ${color}88 100%)`
                 : "transparent",
               border: "none", cursor: "pointer",
-              fontFamily: "'Yusei Magic', sans-serif", fontSize: 15, fontWeight: 700,
+              fontFamily: "'Caveat', cursive", fontSize: 18, fontWeight: 700,
               color: struck ? "#3a2f5e" : palette.softInk,
-              transition: "all 0.2s ease", borderRadius: 16, outline: "none",
+              transition: "all 0.2s ease", borderRadius: 2, outline: "none",
               transform: struck ? "scale(1.08) rotate(-1deg)" : "scale(1)",
             }}
           >
@@ -182,7 +166,6 @@ function MatchCard({ match, onStrike, struck }) {
 
         {/* Tags — shared ones highlighted */}
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-<<<<<<< Updated upstream
           {(match.tags || []).map(tag => {
             const isShared = (match.sharedTags || []).includes(tag);
             return (
@@ -198,18 +181,6 @@ function MatchCard({ match, onStrike, struck }) {
               }}>{tag}</span>
             );
           })}
-=======
-          {match.tags.map(tag => (
-            <span key={tag} style={{
-              fontFamily: "'Inconsolata', monospace", fontSize: 13,
-              padding: "3px 10px",
-              background: `${match.color}33`,
-              color: "#5C4F8A", borderRadius: 20,
-              border: `1.5px solid ${match.color}88`,
-              filter: "url(#sketch)",
-            }}>{tag}</span>
-          ))}
->>>>>>> Stashed changes
         </div>
 
         {/* Shared interests callout */}
@@ -239,30 +210,11 @@ function StruckModal({ match, onClose }) {
       <div style={{ width: "100%", maxWidth: 380, animation: "popIn 0.4s ease" }}>
         <WatercolorCard color={color} lightColor={light}>
           <div style={{ textAlign: "center" }}>
-<<<<<<< Updated upstream
             <div style={{ fontSize: 48, marginBottom: 8 }}>⚡</div>
             <h2 style={{ fontFamily: "'Caveat', cursive", fontSize: 30, fontWeight: 700, color: palette.inkBrown, margin: "0 0 8px" }}>
               You struck {match.name}!
             </h2>
             <p style={{ fontFamily: "'Caveat', cursive", fontSize: 16, color: palette.softInk, opacity: 0.7, margin: "0 0 20px", fontStyle: "italic", lineHeight: 1.5 }}>
-=======
-            <img
-              src={require("../assets/images/logo.png").uri}
-              alt="Strike"
-              style={{ width: 80, height: 80, marginBottom: 0, objectFit: "contain" }}
-            />
-            <h2 style={{
-              fontFamily: "'Yusei Magic', sans-serif", fontSize: 30, fontWeight: 700,
-              color: palette.inkBrown, margin: "0 0 8px",
-            }}>
-              You struck {match.name}!
-            </h2>
-            <p style={{
-              fontFamily: "'Inconsolata', monospace", fontSize: 16,
-              color: palette.softInk, opacity: 0.7, margin: "0 0 20px",
-              fontStyle: "italic", lineHeight: 1.5,
-            }}>
->>>>>>> Stashed changes
               {match.name} will get a notification. If they strike back, you&apos;ll both get each other&apos;s contact info. ✦
             </p>
             <SketchButton color={color} lightColor={light} onClick={onClose} wide>
@@ -292,10 +244,10 @@ function EmptyState({ onNavigate }) {
   return (
     <div style={{ textAlign: "center", padding: "40px 0" }}>
       <div style={{ fontSize: 40, marginBottom: 12 }}>🌿</div>
-      <div style={{ fontFamily: "'Caveat', cursive", fontSize: 20, color: palette.inkBrown, fontStyle: "italic", opacity: 0.6 }}>
+      <div style={{ fontFamily: "'Inconsolata', monospace", fontSize: 20, color: palette.inkBrown, fontStyle: "italic", opacity: 0.6 }}>
         no one nearby right now...
       </div>
-      <div style={{ fontFamily: "'Caveat', cursive", fontSize: 14, color: palette.softInk, opacity: 0.4, marginTop: 6, marginBottom: 20 }}>
+      <div style={{ fontFamily: "'Inconsolata', monospace", fontSize: 14, color: palette.softInk, opacity: 0.4, marginTop: 6, marginBottom: 20 }}>
         try a wider radius or a different time
       </div>
       <SketchButton
@@ -314,7 +266,7 @@ function ErrorState({ message, onRetry }) {
   return (
     <div style={{ textAlign: "center", padding: "40px 0" }}>
       <div style={{ fontSize: 36, marginBottom: 12 }}>⚠️</div>
-      <div style={{ fontFamily: "'Caveat', cursive", fontSize: 16, color: palette.waterRose, fontStyle: "italic", marginBottom: 16 }}>
+      <div style={{ fontFamily: "'Yusei Magic', sans-serif", fontSize: 16, color: palette.waterRose, fontStyle: "italic", marginBottom: 16 }}>
         {message}
       </div>
       <SketchButton color={palette.waterGreen} lightColor={palette.waterGreenLight} onClick={onRetry}>
@@ -392,26 +344,11 @@ export default function ConnectPage({ onNavigate, userInfo = {} }) {
 
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
-<<<<<<< Updated upstream
         <h1 style={{ fontFamily: "'Caveat', cursive", fontSize: 36, fontWeight: 700, color: palette.inkBrown, margin: "0 0 6px", lineHeight: 1.15 }}>
           kindred spirits{" "}
           <span style={{ color: palette.waterGreen, fontStyle: "italic" }}>nearby</span>
         </h1>
         <div style={{ fontFamily: "'Caveat', cursive", fontSize: 15, color: palette.softInk, opacity: 0.65, fontStyle: "italic", display: "flex", alignItems: "center", gap: 6 }}>
-=======
-        <h1 style={{
-          fontFamily: "'Yusei Magic', sans-serif", fontSize: 36, fontWeight: 700,
-          color: palette.inkBrown, margin: "0 0 6px", lineHeight: 1.15,
-        }}>
-          kindred spirits{" "}
-          <span style={{ color: palette.waterGreen, fontStyle: "italic" }}>nearby</span>
-        </h1>
-        <div style={{
-          fontFamily:"'Inconsolata', monospace", fontSize: 15,
-          color: palette.softInk, opacity: 0.65, 
-          display: "flex", alignItems: "center", gap: 6,
-        }}>
->>>>>>> Stashed changes
           <PulseRing color={palette.waterGreen} />
           {loading ? "searching…" : `${matches.length} people free ${timeLabel}`}
           {tags.length > 0 && ` · into ${tags[0]}`}
@@ -426,16 +363,16 @@ export default function ConnectPage({ onNavigate, userInfo = {} }) {
             stroke={`${palette.waterGold}88`} strokeWidth="1.8" style={{ filter: "url(#sketch)" }}
           />
         </svg>
-        <span style={{ fontFamily: "'Inconsolata', monospace", fontSize: 14, color: palette.softInk, opacity: 0.7 }}>
+        <span style={{ fontFamily: "'Caveat', cursive", fontSize: 14, color: palette.softInk, opacity: 0.7 }}>
           showing as <strong style={{ color: palette.inkBrown }}>{name}</strong>
         </span>
         {tags.slice(0, 3).map(t => (
           <span key={t} style={{
-            fontFamily: "'Yusei Magic', sans-serif", fontSize: 12,
+            fontFamily: "'Caveat', cursive", fontSize: 12,
             padding: "2px 8px", borderRadius: 12,
             background: `${palette.waterGold}33`,
             color: "#5C4F8A", border: `1.5px solid ${palette.waterGold}88`,
-            
+            filter: "url(#sketch)",
           }}>{t}</span>
         ))}
         <button
@@ -477,7 +414,7 @@ export default function ConnectPage({ onNavigate, userInfo = {} }) {
       {struckIds.length > 0 && (
         <div style={{
           marginTop: 24, padding: "12px 16px", position: "relative",
-          fontFamily: "'Yusei Magic', sans-serif", fontSize: 15,
+          fontFamily: "'Caveat', cursive", fontSize: 15,
           color: palette.inkBrown, textAlign: "center",
           animation: "fadeSlideUp 0.4s ease",
         }}>

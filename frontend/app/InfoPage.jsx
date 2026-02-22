@@ -154,7 +154,7 @@ export default function InfoPage({ onNavigate, initialStep = 0, initialName = ""
           />
           {submitting && (
             <div style={{
-              fontFamily: "'Caveat', cursive", fontSize: 15,
+              fontFamily: "'Yusei Magic', sans-serif", fontSize: 15,
               color: palette.softInk, textAlign: "center",
               opacity: 0.65, marginTop: 12, fontStyle: "italic",
             }}>
@@ -163,7 +163,7 @@ export default function InfoPage({ onNavigate, initialStep = 0, initialName = ""
           )}
           {geoError && (
             <div style={{
-              fontFamily: "'Caveat', cursive", fontSize: 14,
+              fontFamily:"'Yusei Magic', sans-serif", fontSize: 14,
               color: palette.waterRose, fontStyle: "italic",
               marginTop: 12, textAlign: "center",
             }}>
