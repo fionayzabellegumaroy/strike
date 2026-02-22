@@ -4,7 +4,7 @@ import {
   palette, PageShell, WatercolorBlob, SketchButton,
   SketchInput, WatercolorCard, Footer, SectionLabel,
 } from "./Shared.jsx";
-import { getGroups } from "./api.js";
+import { getGroups, getProfile } from "./api.js";
 import { useContext } from "react";
 import { UserContext } from "../components/UserContext";
 
@@ -62,6 +62,9 @@ export default function HomePage({ onNavigate }) {
   const [activeTab, setActiveTab] = useState("active"); // "active" or "public"
   const [groups, setGroups] = useState([]);
   const { userId } = useContext(UserContext);
+  const [ showGroupModal, setShowGroupModal ] = useState(false);
+  const [selectedGroup, setSelectedGroup] = useState(null);
+  const [memberProfiles, setMemberProfiles] = useState([]);
 
   useEffect(() => {
     if (!userId) return; // wait until userId exists
@@ -80,6 +83,25 @@ export default function HomePage({ onNavigate }) {
 
     loadGroups();
   }, [activeTab, userId]);
+
+  useEffect(() => {
+    async function loadMembers() {
+      if (!selectedGroup || !selectedGroup.member_ids) return;
+      try {
+        const profiles = await Promise.all(
+          selectedGroup.member_ids.map(id => getProfile(id))
+        );
+
+        setMemberProfiles(profiles);
+      } catch (err) {
+        console.error("Failed to load member profiles:", err);
+      }
+    }
+
+    if (showGroupModal) {
+      loadMembers();
+    }
+  }, [showGroupModal, selectedGroup]);
 
   return (
     <PageShell blobs={BLOBS} spores={SPORES}>
@@ -127,9 +149,9 @@ export default function HomePage({ onNavigate }) {
         color={palette.waterGreen}
         lightColor={palette.waterGreenLight}
         style={{
-          marginTop: 100,
+          marginTop: 40,
           minHeight: 200,
-          padding: 20
+          padding: 20,
         }}
       >
         {groups.length === 0 ? (
@@ -144,8 +166,11 @@ export default function HomePage({ onNavigate }) {
           </p>
         ) : (
           groups.map(group => (
-            <div key={group.id} style={{ marginBottom: 16 }}>
+            <div key={group.id} style={{ marginBottom: 16 }} onClick={() => {setShowGroupModal(true); setSelectedGroup(group);}}>
               <h3 style={{ margin: 0 }}>{group.name}</h3>
+              <div style={{ fontSize: 14, color: palette.softInk, opacity: 0.8 }}>
+                {group.tags.join(", ")}
+              </div>
               <div style={{ fontSize: 14, opacity: 0.6 }}>
                 {group.member_ids.length} members
               </div>
@@ -156,6 +181,64 @@ export default function HomePage({ onNavigate }) {
           ))
         )}
       </WatercolorCard>
+
+      {showGroupModal && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.35)",
+            backdropFilter: "blur(3px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 9999,
+          }}
+        >
+          <WatercolorCard
+            color={palette.waterBlue}
+            lightColor={palette.waterBlueLight}
+            style={{
+              width: "90%",
+              maxWidth: 420,
+              padding: 24,
+              position: "relative",
+            }}
+          >
+            {/* Back Button */}
+            <SketchButton
+              color={palette.waterGold}
+              lightColor={palette.waterGoldLight}
+              onClick={() => {
+                setShowGroupModal(false);
+                setMemberProfiles([]);
+              }}
+              style={{
+                position: "absolute",
+                top: 12,
+                left: 12,
+                background: "none",
+                border: "none",
+                fontSize: 16,
+                cursor: "pointer",
+                fontFamily: "'Caveat', cursive",
+              }}
+            >
+              ← Back
+            </SketchButton>
+
+            <h2 style={{ textAlign: "center", marginTop: 10 }}>
+              {selectedGroup?.name}
+            </h2>
+
+            <div style={{ marginTop: 20 }}>
+              {memberProfiles.map(member => (
+                <p key={member.id}>{member.name}</p>
+              ))}
+            </div>
+          </WatercolorCard>
+        </div>
+      )}
       <Footer />
     </PageShell>
   );
