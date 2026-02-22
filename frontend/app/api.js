@@ -57,8 +57,54 @@ export async function deleteProfile(id) {
   await fetch(`${BASE_URL}/profile/${id}`, { method: "DELETE" });
 }
 
-export async function test(){
-  const res = await fetch(`${BASE_URL}/test`);
-  if (!res.ok) throw new Error(`GET /test failed: ${res.status}`);
-  return res.json()
+export async function createGroup({
+  userId,
+  name,
+  time,
+  tags = [],
+  type = "active",      // default if not provided
+  numPeople = 0
+}) {
+  const res = await fetch(`${BASE_URL}/group`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      user_id: userId,
+      name,
+      time,
+      tags,
+      type,
+      num_people: numPeople,
+    }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    console.log("Server returned:", text);
+    throw new Error("Failed to create group");
+  }
+
+  return res.json();
+}
+
+export async function getProfile(userId) {
+  const res = await fetch(`${BASE_URL}/profile/${userId}`);
+
+  if (!res.ok) {
+    const text = await res.text();
+    console.error("Server error:", text);
+    throw new Error("Failed to fetch profile");
+  }
+
+  return res.json();
+}
+
+export async function getGroups({ userId, type }) {
+  const res = await fetch(`${BASE_URL}/groups?user_id=${userId}&type=${type}`);
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch groups");
+  }
+
+  return res.json();
 }

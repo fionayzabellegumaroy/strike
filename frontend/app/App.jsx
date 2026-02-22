@@ -5,6 +5,7 @@ import InfoPage    from "./InfoPage.jsx";
 import ConnectPage from "./ConnectPage.jsx";
 import Register    from "./Register.jsx";
 import HomePage    from "./HomePage.jsx";
+import { UserProvider } from "../components/UserContext.jsx";
 
 export default function App() {
   const [page, setPage]         = useState("landing");

@@ -1,9 +1,12 @@
 // ── LandingPage.jsx ───────────────────────────────────────────────────────
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   palette, PageShell, WatercolorBlob, SketchButton,
   SketchInput, WatercolorCard, Footer, SectionLabel,
 } from "./Shared.jsx";
+import { getGroups } from "./api.js";
+import { useContext } from "react";
+import { UserContext } from "../components/UserContext";
 
 // ── Blobs for landing ─────────────────────────────────────────────────────
 const BLOBS = (
@@ -57,6 +60,26 @@ function Wordmark() {
 
 export default function HomePage({ onNavigate }) {
   const [activeTab, setActiveTab] = useState("active"); // "active" or "public"
+  const [groups, setGroups] = useState([]);
+  const { userId } = useContext(UserContext);
+
+  useEffect(() => {
+    if (!userId) return; // wait until userId exists
+
+    async function loadGroups() {
+      try {
+        const data = await getGroups({
+          userId,
+          type: activeTab,
+        });
+        setGroups(data);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    loadGroups();
+  }, [activeTab, userId]);
 
   return (
     <PageShell blobs={BLOBS} spores={SPORES}>
@@ -100,6 +123,39 @@ export default function HomePage({ onNavigate }) {
           Public Groups
         </SketchButton>
       </div>
+      <WatercolorCard
+        color={palette.waterGreen}
+        lightColor={palette.waterGreenLight}
+        style={{
+          marginTop: 100,
+          minHeight: 200,
+          padding: 20
+        }}
+      >
+        {groups.length === 0 ? (
+          <p style={{
+            fontFamily: "'Caveat', cursive",
+            fontSize: 18,
+            color: palette.inkBrown,
+            opacity: 0.6,
+            fontStyle: "italic",
+          }}>
+            No groups yet.
+          </p>
+        ) : (
+          groups.map(group => (
+            <div key={group.id} style={{ marginBottom: 16 }}>
+              <h3 style={{ margin: 0 }}>{group.name}</h3>
+              <div style={{ fontSize: 14, opacity: 0.6 }}>
+                {group.member_ids.length} members
+              </div>
+              <div style={{ fontSize: 14 }}>
+                {new Date(group.time).toLocaleString()}
+              </div>
+            </div>
+          ))
+        )}
+      </WatercolorCard>
       <Footer />
     </PageShell>
   );

@@ -8,6 +8,8 @@ import StepName from "./StepName";
 import StepTags from "./StepTags";
 import StepTime from "./StepTime";
 import { createProfile } from "./api.js";
+import { useContext } from "react";
+import { UserContext } from "../components/UserContext";
 
 const BLOBS = (
   <>
@@ -70,6 +72,8 @@ export default function InfoPage({ onNavigate, initialStep = 0, initialName = ""
   const [submitting, setSubmitting] = useState(false);
   const [geoError,   setGeoError]   = useState("");
 
+  const { setUserId } = useContext(UserContext);
+
   const handleBack = () => {
     if (step === 0 || (step === 1 && initialStep === 1)) {
       onNavigate("landing");
@@ -104,6 +108,8 @@ export default function InfoPage({ onNavigate, initialStep = 0, initialName = ""
         color:        palette.waterRose,
         light:        palette.waterRoseLight,
       });
+
+      setUserId(id);
 
       // 3. Navigate to matches, passing everything ConnectPage needs
       onNavigate("connect", {

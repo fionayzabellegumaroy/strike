@@ -32,6 +32,17 @@ db.exec(`
     sent_at  INTEGER DEFAULT (strftime('%s','now')),
     UNIQUE(from_id, to_id)
   );
+
+  CREATE TABLE IF NOT EXISTS groups (
+  id           INTEGER PRIMARY KEY AUTOINCREMENT,
+  name         TEXT NOT NULL,
+  member_ids   TEXT,
+  created_at   INTEGER DEFAULT (strftime('%s','now')),
+  time         TEXT,
+  tags         TEXT,
+  type         TEXT,
+  num_people   INTEGER DEFAULT 0
+  );  
 `);
 
 // ── Haversine distance (miles) ─────────────────────────────────────────────
@@ -193,6 +204,91 @@ app.get("/profile/:id", (req, res) => {
 app.delete("/profile/:id", (req, res) => {
   db.prepare("DELETE FROM profiles WHERE id = ? AND is_user = 1").run(req.params.id);
   res.json({ success: true });
+});
+
+app.post("/group", (req, res) => {
+  const {
+    user_id,
+    name,
+    time,
+    tags = [],
+    type = "active",
+    num_people = 0
+  } = req.body;
+
+  if (!user_id || !name || !time) {
+    return res.status(400).json({
+      error: "Missing required fields: user_id, name, time",
+    });
+  }
+
+  const nudged = db.prepare(
+    "SELECT to_id FROM nudges WHERE from_id = ?"
+  ).all(user_id);
+
+  const memberIds = [user_id, ...nudged.map(r => r.to_id)];
+
+  const result = db.prepare(`
+    INSERT INTO groups (name, member_ids, time, tags, type, num_people)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `).run(
+    name,
+    JSON.stringify(memberIds),
+    time,
+    JSON.stringify(tags),
+    type,
+    num_people
+  );
+
+  res.json({
+    id: result.lastInsertRowid,
+    member_ids: memberIds
+  });
+});
+
+// ── GET /groups ─────────────────────────────────────────────
+// Query params:
+//   user_id  (required for active groups)
+//   type     ("active" or "public")
+app.get("/groups", (req, res) => {
+  try {
+    const { user_id, type } = req.query;
+
+    if (!type) {
+      return res.status(400).json({ error: "type is required" });
+    }
+
+    const groups = db
+      .prepare("SELECT * FROM groups WHERE type = ?")
+      .all(type);
+
+    const filtered = groups.filter(group => {
+      const members = group.member_ids
+        ? JSON.parse(group.member_ids)
+        : [];
+
+      if (type === "active") {
+        return members.includes(Number(user_id));
+      }
+
+      if (type === "public") {
+        return true;
+      }
+
+      return false;
+    });
+
+    const parsed = filtered.map(g => ({
+      ...g,
+      member_ids: g.member_ids ? JSON.parse(g.member_ids) : [],
+      tags: g.tags ? JSON.parse(g.tags) : [],
+    }));
+
+    res.json(parsed);
+  } catch (err) {
+    console.error("Groups error:", err);
+    res.status(500).json({ error: "Failed to fetch groups" });
+  }
 });
 
 app.listen(3001, () => console.log("⚡ Strike API on :3001"));

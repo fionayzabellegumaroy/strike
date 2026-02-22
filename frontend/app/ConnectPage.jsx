@@ -4,7 +4,7 @@ import {
   palette, PageShell, WatercolorBlob, SketchButton,
   WatercolorCard, TopBar, Footer, SectionLabel,
 } from "./Shared";
-import { fetchMatches, sendNudge } from "./api.js";
+import { createGroup, fetchMatches, sendNudge } from "./api.js";
 
 const BLOBS = (
   <>
@@ -520,14 +520,24 @@ export default function ConnectPage({ onNavigate, userInfo = {} }) {
         <GroupModal
            onNavigate={onNavigate}
            onClose={() => setGroupModal(false)}
-           onConfirm={(groupSize) => {
-             console.log("Selected group size:", groupSize);
-             setGroupModal(false);
+           onConfirm={async (groupSize) => {
+            try {
+              const result = await createGroup({
+                userId: userId, // your logged in profile id
+                name: `${name}'s Group`,
+                time: dateTime,
+                tags: tags,
+              });
 
-              // You can now send this to backend later
-              // Example:
-              // createGroup({ struckIds, groupSize })
-           }}
+              console.log("Group created:", result);
+
+              // optionally navigate to home
+              onNavigate("home");
+
+            } catch (err) {
+              console.error(err);
+            }
+          }}
          />
        )}
 
