@@ -118,6 +118,7 @@ export default function HomePage({ onNavigate }) {
       <div style={{display: "flex",
         justifyContent: "space-between",
         gap: 12,
+        marginBottom: 40,
         marginTop: 14}}>
         <SketchButton
           onClick={() => setActiveTab("active")}
@@ -230,6 +231,18 @@ export default function HomePage({ onNavigate }) {
           </WatercolorCard>
         </div>
       )}
+
+      <div style={{marginTop: 50, display: "flex", justifyContent: "center"}}>
+        <SketchButton
+          color={palette.waterGold}
+          lightColor={palette.waterGold}
+          onClick={() => onNavigate("connect")}
+          wide
+        >
+          ⚡ I am down to hang
+        </SketchButton>
+      </div>
+     
       <Footer />
     </PageShell>
   );
