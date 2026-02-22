@@ -171,7 +171,7 @@ export function Spores({ list }) {
 
 export function PageShell({ children, blobs, spores }) {
   return (
-    <div style={{ minHeight: "100vh", background: "#FFFFFF", fontFamily: "'Caveat', cursive", position: "relative", overflowX: "hidden", overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
+    <div style={{ minHeight: "100vh", background: "#FFFFFF", fontFamily: "'Caveat', cursive", position: "relative", overflowX: "hidden" }}>
       <style dangerouslySetInnerHTML={{ __html: animationCSS }} />
       <div dangerouslySetInnerHTML={{ __html: sketchFilter }} />
       <div style={{
@@ -180,7 +180,13 @@ export function PageShell({ children, blobs, spores }) {
       }} />
       {blobs}
       {spores && <Spores list={spores} />}
-      <div style={{ position: "relative", zIndex: 1, maxWidth: 420, margin: "0 auto", padding: "40px 24px 56px" }}>
+    <div style={{
+      position: "relative",
+      zIndex: 1,
+      maxWidth: 420,
+      margin: "0 auto",
+      padding: "40px 24px 120px", // extra bottom padding helps
+    }}>
         {children}
       </div>
     </div>
