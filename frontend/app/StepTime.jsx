@@ -2,7 +2,126 @@
 import { useState } from "react";
 import { palette, WatercolorCard, SketchButton } from "./Shared";
 
-const TIMES = ["now!", "this afternoon", "this evening", "tomorrow morning", "this weekend", "whenever"];
+// Calendar
+function Calendar({ selectedDate, onSelectDate }) {
+  const [currentDate, setCurrentDate] = useState(new Date());
+
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+
+  const monthNames = [
+    "January","February","March","April","May","June",
+    "July","August","September","October","November","December"
+  ];
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const totalDays = new Date(year, month + 1, 0).getDate();
+
+  const today = new Date();
+
+  const daysArray = [];
+
+  // Empty cells
+  for (let i = 0; i < firstDay; i++) {
+    daysArray.push(<div key={"empty-" + i} className="cal-day empty"></div>);
+  }
+
+  // Actual days
+  for (let d = 1; d <= totalDays; d++) {
+    const thisDate = new Date(year, month, d);
+
+    const isToday =
+      d === today.getDate() &&
+      month === today.getMonth() &&
+      year === today.getFullYear();
+
+    const isSelected =
+      selectedDate &&
+      thisDate.toDateString() === selectedDate.toDateString();
+
+    daysArray.push(
+      <div
+        key={d}
+        className={`cal-day ${isToday ? "today" : ""} ${isSelected ? "selected-day" : ""}`}
+        onClick={() => onSelectDate(thisDate)}
+      >
+        {d}
+      </div>
+    );
+  }
+
+  return (
+    <div>
+         <style>{`
+        .cal-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 12px;
+        }
+
+        .cal-grid {
+          display: grid;
+          grid-template-columns: repeat(7, 1fr);
+          gap: 6px;
+        }
+
+        .cal-day {
+          aspect-ratio: 1;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          cursor: pointer;
+          border-radius: 8px;
+          font-family: 'Caveat', cursive;
+          font-size: 16px;
+        }
+
+        .cal-day:hover {
+          background: rgba(163, 201, 136, 0.2);
+        }
+
+        .today {
+          border: 1px solid black;
+        }
+
+        .selected-day {
+          background: black;
+          color: white;
+        }
+      `}</style>
+
+      <div className="cal-header">
+        <button
+          className="cal-nav"
+          onClick={() =>
+            setCurrentDate(new Date(year, month - 1, 1))
+          }
+        >
+          ‹
+        </button>
+
+        <span>{monthNames[month]} {year}</span>
+
+        <button
+          className="cal-nav"
+          onClick={() =>
+            setCurrentDate(new Date(year, month + 1, 1))
+          }
+        >
+          ›
+        </button>
+      </div>
+
+      <div className="cal-grid">
+        {["Su","Mo","Tu","We","Th","Fr","Sa"].map(day => (
+          <div key={day} className="cal-day-label">{day}</div>
+        ))}
+        {daysArray}
+      </div>
+    </div>
+  );
+}
 
 // ── Time pill ─────────────────────────────────────────────────────────────
 function TimePill({ label, selected, onClick }) {
@@ -42,6 +161,24 @@ function TimePill({ label, selected, onClick }) {
 // ── Main StepTime component ───────────────────────────────────────────────
 export default function StepTime({ name, tags, onDone }) {
   const [selectedTime, setSelectedTime] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
+  
+  const handleSubmit = () => {
+  if (!selectedDate || !selectedTime) return;
+
+  const combined = new Date(selectedDate);
+  const [hours, minutes] = selectedTime.split(":");
+
+  combined.setHours(hours);
+  combined.setMinutes(minutes);
+  combined.setSeconds(0);
+
+  onDone({
+    name,
+    tags,
+    dateTime: combined
+  });
+};
 
   return (
     <WatercolorCard color={palette.waterGreen} lightColor={palette.waterGreenLight}>
@@ -58,22 +195,44 @@ export default function StepTime({ name, tags, onDone }) {
       }}>
         We&apos;ll only show you people who are free at the same time.
       </p>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 20 }}>
-        {TIMES.map(t => (
-          <TimePill
-            key={t}
-            label={t}
-            selected={selectedTime === t}
-            onClick={() => setSelectedTime(t)}
-          />
-        ))}
+      <Calendar
+        selectedDate={selectedDate}
+        onSelectDate={setSelectedDate}
+      />
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: 10,
+          marginBottom: 20,
+          marginTop: 15,
+          fontFamily: "'Caveat', cursive",
+        }}
+      >
+        <span style={{ fontSize: 16 }}>Time:</span>
+
+        <input
+          type="time"
+          value={selectedTime || ""}
+          onChange={(e) => setSelectedTime(e.target.value)}
+          style={{
+            padding: "6px 10px",
+            fontSize: 15,
+            borderRadius: 8,
+            border: "1px solid rgba(0,0,0,0.2)",
+            background: "white",
+            fontFamily: "'Caveat', cursive",
+            cursor: "pointer",
+          }}
+        />
       </div>
       <SketchButton
         color={palette.waterGreen}
         lightColor={palette.waterGreenLight}
-        onClick={() => { if (selectedTime) onDone({ name, tags, time: selectedTime }); }}
+        onClick={handleSubmit}
         wide
-        disabled={!selectedTime}
+        disabled={!selectedTime || !selectedDate || new Date(selectedDate) < new Date()}
       >
         Find my people →
       </SketchButton>
