@@ -7,6 +7,7 @@ import {
 import { getGroups, getProfile } from "./api.js";
 import { useContext } from "react";
 import { UserContext } from "../components/UserContext";
+const logo = require("../assets/images/logoName.png");
 
 // ── Blobs for landing ─────────────────────────────────────────────────────
 const BLOBS = (
@@ -36,25 +37,15 @@ const SPORES = [
 // ── Wordmark with lightning-bolt logo ────────────────────────────────────
 function Wordmark() {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 36 }}>
-      <svg width="56" height="56" viewBox="0 0 48 48" style={{ filter: "url(#roughBorder)" }}>
-        <circle cx="24" cy="24" r="18" fill={`${palette.waterGold}66`} stroke="rgba(123,111,160,1)" strokeWidth="2.5"/>
-        <path d="M26 11 L18 25 L23 25 L20 37 L30 21 L25 21 Z"
-          fill={palette.waterGold} stroke="rgba(123,111,160,1)" strokeWidth="1.2" strokeLinejoin="round"
-        />
-      </svg>
-      <div>
-        <span style={{
-          fontFamily: "'Caveat', cursive", fontSize: 34, fontWeight: 700,
-          color: palette.inkBrown, letterSpacing: "-0.01em", fontStyle: "italic",
-        }}>strike</span>
-        <div style={{
-          width: 8, height: 8, borderRadius: "50%", background: palette.waterRose,
-          display: "inline-block", marginLeft: 4, marginBottom: 6,
-          verticalAlign: "bottom", filter: "url(#sketch)",
-        }} />
-      </div>
+    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 25 }}>
+      <img
+        src={logo.uri}
+        alt="Strike"
+        style={{ width: 100, height: 100 }}
+      /> 
+      
     </div>
+  
   );
 }
 

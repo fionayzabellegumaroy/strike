@@ -2,7 +2,6 @@
 import { useState } from "react";
 import React from 'react';
 const logoName = require("../assets/images/logoName.png");
-console.log("logo:", logoName);
 
 import {
   palette, PageShell, WatercolorBlob, SketchButton,
