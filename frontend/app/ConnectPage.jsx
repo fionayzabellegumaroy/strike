@@ -187,44 +187,6 @@ function MatchCard({ match, onStrike, struck }) {
   );
 }
 
-// ── Struck confirmation modal ─────────────────────────────────────────────
-function StruckModal({ match, onClose, userName }) {
-  return (
-    <div style={{
-      position: "fixed", inset: 0, zIndex: 100,
-      display: "flex", alignItems: "center", justifyContent: "center",
-      background: "rgba(255,255,255,0.7)", backdropFilter: "blur(4px)",
-      padding: "0 24px",
-    }}>
-      <div style={{ width: "100%", maxWidth: 380, animation: "popIn 0.4s ease" }}>
-        <WatercolorCard color={match.color} lightColor={match.light}>
-          <div style={{ textAlign: "center" }}>
-            <div style={{ fontSize: 48, marginBottom: 8 }}>⚡</div>
-            <h2 style={{
-              fontFamily: "'Caveat', cursive", fontSize: 30, fontWeight: 700,
-              color: palette.inkBrown, margin: "0 0 8px",
-            }}>
-              You struck {match.name}!
-            </h2>
-            <p style={{
-              fontFamily: "'Caveat', cursive", fontSize: 16,
-              color: palette.softInk, opacity: 0.7, margin: "0 0 20px",
-              fontStyle: "italic", lineHeight: 1.5,
-            }}>
-              {match.name} will get a notification. If they strike back, you&apos;ll both get each other&apos;s contact info. ✦
-            </p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              <SketchButton color={match.color} lightColor={match.light} onClick={onClose} wide>
-                Keep browsing →
-              </SketchButton>
-            </div>
-          </div>
-        </WatercolorCard>
-      </div>
-    </div>
-  );
-}
-
 // ── Empty state ───────────────────────────────────────────────────────────
 function EmptyState() {
   return (
@@ -246,11 +208,87 @@ function EmptyState() {
   );
 }
 
+function GroupModal({ onClose, onConfirm, onNavigate }) {
+  const [mode, setMode] = useState("one"); // "one" or "group"
+  const [groupSize, setGroupSize] = useState(2);
+
+  return (
+    <div style={overlayStyle}>
+      <div style={modalStyle}>
+        <h2 style={titleStyle}>
+          How do you want to hang out?
+        </h2>
+
+        {/* Option buttons */}
+        <div style={{ display: "flex", gap: 16, marginBottom: 20, justifyContent: "center" }}>
+          {/* <button
+            onClick={() => setMode("one")}
+            style={optionButton(mode === "one")}
+          >
+            1-on-1
+          </button> */}
+
+          <SketchButton
+            onClick={() => setMode("group")}
+            style={optionButton(mode === "group")}
+          >
+            Group
+          </SketchButton>
+        </div>
+
+        {/* Group size selector */}
+        {mode === "group" && (
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ marginBottom: 8 }}>How many people?</div>
+
+           <div style={{ display: "flex", alignItems: "center", gap: 12, justifyContent: "center" }}>
+            <SketchButton
+              onClick={() => setGroupSize(prev => Math.max(2, prev - 1))}
+              disabled={groupSize == 2}
+            >
+              −
+            </SketchButton>
+
+            <div style={{ fontSize: 20, minWidth: 30, textAlign: "center" }}>
+              {groupSize}
+            </div>
+
+            <SketchButton
+              onClick={() => setGroupSize(prev => Math.min(10, prev + 1))}
+              disabled={groupSize == 10}
+            >
+              +
+            </SketchButton>
+            </div>
+          </div>
+        )}
+
+        {/* Buttons */}
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <SketchButton onClick={onClose}>Cancel</SketchButton>
+
+          <SketchButton
+            onClick={() => {
+              onConfirm(mode === "one" ? 1 : groupSize);
+              onNavigate("home");
+            }}
+          >
+            Confirm
+          </SketchButton>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
 // ── Main Connect Page ─────────────────────────────────────────────────────
 export default function ConnectPage({ onNavigate, userInfo = {} }) {
   const { name = "you", tags = [], time = "now" } = userInfo;
   const [struckIds, setStruckIds] = useState([]);
-  const [activeModal, setActiveModal] = useState(null);
+  const [groupModal, setGroupModal] = useState(false);
+
+  console.log("struck id length: ", struckIds.length);
 
   // Filter matches to those sharing at least one tag
   const matches = MOCK_MATCHES.filter(m =>
@@ -264,7 +302,6 @@ export default function ConnectPage({ onNavigate, userInfo = {} }) {
     if (struckIds.includes(id)) return;
     setStruckIds(prev => [...prev, id]);
     const match = MOCK_MATCHES.find(m => m.id === id);
-    setActiveModal(match);
   };
 
   return (
@@ -353,16 +390,65 @@ export default function ConnectPage({ onNavigate, userInfo = {} }) {
         </div>
       )}
 
-      <Footer />
+      <div style={{
+                marginTop: 24, padding: "12px 16px", position: "relative",
+                fontFamily: "'Caveat', cursive", fontSize: 15,
+                color: palette.inkBrown, textAlign: "center",
+                animation: "fadeSlideUp 0.4s ease",
+              }}>     
+          <SketchButton style={{ color: palette.waterBlue, lightColor: palette.waterBlueLight, position: "relative", zIndex: 1 }} onClick={() => {setGroupModal(true)}} disabled={struckIds.length === 0}>
+              continue
+            </SketchButton>
+      </div>
 
-      {/* Modal */}
-      {activeModal && (
-        <StruckModal
-          match={activeModal}
-          userName={name}
-          onClose={() => setActiveModal(null)}
+      {/* Group modal */}
+      {groupModal && (
+        <GroupModal
+          onNavigate={onNavigate}
+          onClose={() => setGroupModal(false)}
+          onConfirm={(groupSize) => {
+            console.log("Selected group size:", groupSize);
+            setGroupModal(false);
+
+            // You can now send this to backend later
+            // Example:
+            // createGroup({ struckIds, groupSize })
+          }}
         />
       )}
+
+      <Footer />
+
     </PageShell>
   );
 }
+
+const overlayStyle = {
+  position: "fixed",
+  inset: 0,
+  background: "rgba(0,0,0,0.4)",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  zIndex: 999,
+};
+
+const modalStyle = {
+  background: "white",
+  padding: 30,
+  borderRadius: 16,
+  width: 350,
+  textAlign: "center",
+};
+
+const titleStyle = {
+  marginBottom: 20,
+};
+
+const optionButton = (active) => ({
+  padding: "10px 16px",
+  borderRadius: 10,
+  border: active ? "2px solid black" : "1px solid #ccc",
+  background: active ? "#f3f3f3" : "white",
+  cursor: "pointer",
+});

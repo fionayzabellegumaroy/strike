@@ -1,0 +1,106 @@
+// ── LandingPage.jsx ───────────────────────────────────────────────────────
+import { useState } from "react";
+import {
+  palette, PageShell, WatercolorBlob, SketchButton,
+  SketchInput, WatercolorCard, Footer, SectionLabel,
+} from "./Shared.jsx";
+
+// ── Blobs for landing ─────────────────────────────────────────────────────
+const BLOBS = (
+  <>
+    <WatercolorBlob color={palette.waterBlue}     lightColor={palette.waterBlueLight}     x="-90px" y="-70px" size={360} opacity={0.38} animIndex={0} duration={11} delay={0}   rv={0}/>
+    <WatercolorBlob color={palette.waterGold}     lightColor={palette.waterGoldLight}     x="52%"   y="-50px" size={320} opacity={0.33} animIndex={1} duration={10} delay={0.5} rv={1}/>
+    <WatercolorBlob color={palette.waterGreen}    lightColor={palette.waterGreenLight}    x="-60px" y="35%"   size={260} opacity={0.26} animIndex={2} duration={13} delay={1}   rv={2}/>
+    <WatercolorBlob color={palette.waterRose}     lightColor={palette.waterRoseLight}     x="60%"   y="40%"   size={240} opacity={0.24} animIndex={3} duration={12} delay={2}   rv={3}/>
+    <WatercolorBlob color={palette.waterBlue}     lightColor={palette.waterBlueLight}     x="25%"   y="58%"   size={180} opacity={0.16} animIndex={7} duration={15} delay={2.2} rv={1}/>
+    <WatercolorBlob color={palette.waterRose}     lightColor={palette.waterRoseLight}     x="38%"   y="-20px" size={150} opacity={0.20} animIndex={6} duration={12} delay={4}   rv={2}/>
+    <WatercolorBlob color={palette.waterLavender} lightColor={palette.waterLavenderLight} x="30%"   y="85%"   size={280} opacity={0.22} animIndex={0} duration={16} delay={1.8} rv={0}/>
+    <WatercolorBlob color={palette.waterRose}     lightColor={palette.waterRoseLight}     x="65%"   y="82%"   size={220} opacity={0.20} animIndex={5} duration={10} delay={2}   rv={3}/>
+  </>
+);
+
+const SPORES = [
+  [80,  90,  palette.waterGold,     0.55, 0,   7],
+  [340, 110, palette.waterRose,     0.45, 1,   9],
+  [210, 52,  palette.waterBlue,     0.50, 2,   8],
+  [370, 200, palette.waterGreen,    0.45, 0.5, 11],
+  [30,  260, palette.waterLavender, 0.40, 1.5, 7],
+  [290, 310, palette.waterGold,     0.40, 0.8, 10],
+  [155, 140, palette.waterRose,     0.35, 2,   9],
+  [60,  400, palette.waterBlue,     0.38, 0.3, 12],
+];
+
+// ── Wordmark with lightning-bolt logo ────────────────────────────────────
+function Wordmark() {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 36 }}>
+      <svg width="56" height="56" viewBox="0 0 48 48" style={{ filter: "url(#roughBorder)" }}>
+        <circle cx="24" cy="24" r="18" fill={`${palette.waterGold}66`} stroke="rgba(123,111,160,1)" strokeWidth="2.5"/>
+        <path d="M26 11 L18 25 L23 25 L20 37 L30 21 L25 21 Z"
+          fill={palette.waterGold} stroke="rgba(123,111,160,1)" strokeWidth="1.2" strokeLinejoin="round"
+        />
+      </svg>
+      <div>
+        <span style={{
+          fontFamily: "'Caveat', cursive", fontSize: 34, fontWeight: 700,
+          color: palette.inkBrown, letterSpacing: "-0.01em", fontStyle: "italic",
+        }}>strike</span>
+        <div style={{
+          width: 8, height: 8, borderRadius: "50%", background: palette.waterRose,
+          display: "inline-block", marginLeft: 4, marginBottom: 6,
+          verticalAlign: "bottom", filter: "url(#sketch)",
+        }} />
+      </div>
+    </div>
+  );
+}
+
+export default function HomePage({ onNavigate }) {
+  const [activeTab, setActiveTab] = useState("active"); // "active" or "public"
+
+  return (
+    <PageShell blobs={BLOBS} spores={SPORES}>
+
+      <Wordmark />
+
+      {/* Headline */}
+      <div style={{ textAlign: "center", marginBottom: 24 }}>
+        <h1 style={{
+          fontFamily: "'Caveat', cursive", fontSize: 46, fontWeight: 700,
+          color: palette.inkBrown, margin: "0 0 12px", lineHeight: 1.12, letterSpacing: "-0.01em",
+        }}>
+          Home
+        </h1>
+        <p style={{
+          fontFamily: "'Caveat', cursive", fontSize: 17, color: palette.softInk,
+          opacity: 0.7, margin: 0, lineHeight: 1.5, fontStyle: "italic",
+        }}>
+          Find your active groups, and public groups to join.
+        </p>
+      </div>
+
+      <div style={{display: "flex",
+        justifyContent: "space-between",
+        gap: 12,
+        marginTop: 14}}>
+        <SketchButton
+          onClick={() => setActiveTab("active")}
+          color={activeTab === "active" ? palette.waterGreen : palette.softInk}
+          lightColor={activeTab === "active" ? palette.waterGreenLight : "#E8E8E8"}
+          active={activeTab === "active"}
+        >
+          Active Groups
+        </SketchButton>
+        <SketchButton
+          onClick={() => setActiveTab("public")}
+          color={activeTab === "public" ? palette.waterGreen : palette.softInk}
+          lightColor={activeTab === "public" ? palette.waterGreenLight : "#E8E8E8"}
+          active={activeTab === "public"}
+        >
+          Public Groups
+        </SketchButton>
+      </div>
+      <Footer />
+    </PageShell>
+  );
+}

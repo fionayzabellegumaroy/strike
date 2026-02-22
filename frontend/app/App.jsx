@@ -4,6 +4,7 @@ import LandingPage  from "./LandingPage.jsx";
 import InfoPage     from "./InfoPage.jsx";
 import ConnectPage  from "./ConnectPage.jsx";
 import Register     from "./Register.jsx";
+import HomePage     from "./HomePage.jsx";
 
 // Simple in-memory router — swap for React Router if you prefer
 export default function App() {
@@ -28,6 +29,8 @@ export default function App() {
   }
   if (page === "connect") return <ConnectPage onNavigate={navigate} userInfo={userInfo} />;
   if (page === "register") return <Register    onNavigate={navigate} />;
+  if (page === "home") return <HomePage    onNavigate={navigate} />;
+
 
   return <LandingPage onNavigate={navigate} />;
 }
