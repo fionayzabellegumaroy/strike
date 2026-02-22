@@ -1,9 +1,12 @@
-// ── InfoPage.jsx — name, vibe tags, availability ──────────────────────────
+// ── InfoPage.jsx — orchestrates StepName → StepTags → StepTime ───────────
 import { useState } from "react";
 import {
-  palette, PageShell, WatercolorBlob, SketchButton, SketchInput,
-  WatercolorCard, TopBar, Footer, SectionLabel,
+  palette, PageShell, WatercolorBlob,
+  TopBar, Footer,
 } from "./Shared";
+import StepName from "./StepName";
+import StepTags from "./StepTags";
+import StepTime from "./StepTime";
 
 const BLOBS = (
   <>
@@ -27,101 +30,8 @@ const SPORES = [
   [300, 500, palette.waterGreen,    0.30, 2.5, 12],
 ];
 
-// ── All available vibe tags ───────────────────────────────────────────────
-const ALL_TAGS = [
-  { label: "☕ coffee",       color: palette.waterGold,     light: palette.waterGoldLight },
-  { label: "📚 studying",     color: palette.waterBlue,     light: palette.waterBlueLight },
-  { label: "🎨 art",          color: palette.waterRose,     light: palette.waterRoseLight },
-  { label: "🌿 outdoors",     color: palette.waterGreen,    light: palette.waterGreenLight },
-  { label: "🎮 gaming",       color: palette.waterLavender, light: palette.waterLavenderLight },
-  { label: "🍕 food",         color: palette.waterGold,     light: palette.waterGoldLight },
-  { label: "🎵 music",        color: palette.waterRose,     light: palette.waterRoseLight },
-  { label: "🏃 active",       color: palette.waterGreen,    light: palette.waterGreenLight },
-  { label: "🎬 movies",       color: palette.waterBlue,     light: palette.waterBlueLight },
-  { label: "📖 reading",      color: palette.waterLavender, light: palette.waterLavenderLight },
-  { label: "🧘 chill",        color: palette.waterGold,     light: palette.waterGoldLight },
-  { label: "🌙 night owl",    color: palette.waterBlue,     light: palette.waterBlueLight },
-  { label: "☀️ early bird",   color: palette.waterGold,     light: palette.waterGoldLight },
-  { label: "🐾 pets",         color: palette.waterGreen,    light: palette.waterGreenLight },
-  { label: "✈️ travel",       color: palette.waterRose,     light: palette.waterRoseLight },
-  { label: "💻 tech",         color: palette.waterBlue,     light: palette.waterBlueLight },
-];
-
-const TIMES = ["now!", "this afternoon", "this evening", "tomorrow morning", "this weekend", "whenever"];
-
-// ── Selectable tag pill ───────────────────────────────────────────────────
-function TagPill({ tag, selected, onClick, animDelay }) {
-  const [hovered, setHovered] = useState(false);
-  return (
-    <div
-      onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        position: "relative",
-        padding: "7px 16px",
-        cursor: "pointer",
-        fontFamily: "'Caveat', cursive", fontSize: 15, fontWeight: 600,
-        color: selected ? "#3a2f5e" : "rgba(91,78,138,0.55)",
-        background: selected
-          ? `radial-gradient(ellipse at 35% 35%, ${tag.light} 0%, ${tag.color}66 100%)`
-          : hovered ? `${tag.light}55` : "transparent",
-        transform: selected
-          ? "rotate(-0.5deg) scale(1.04)"
-          : hovered ? "scale(1.02)" : "scale(1)",
-        transition: "all 0.2s ease",
-        borderRadius: 2,
-        animation: `tagPop 0.4s ease ${animDelay}s both`,
-      }}
-    >
-      <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", overflow: "visible", pointerEvents: "none" }}>
-        <rect x="2" y="2" width="calc(100% - 4px)" height="calc(100% - 4px)"
-          rx="20" fill="none"
-          stroke={selected ? "#5C4F8A" : "rgba(123,111,160,0.3)"}
-          strokeWidth={selected ? "2" : "1.5"}
-          style={{ filter: "url(#sketch)" }}
-        />
-      </svg>
-      {tag.label}
-    </div>
-  );
-}
-
-// ── Time pill ─────────────────────────────────────────────────────────────
-function TimePill({ label, selected, onClick }) {
-  const [hovered, setHovered] = useState(false);
-  return (
-    <div
-      onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        position: "relative", padding: "8px 18px", cursor: "pointer",
-        fontFamily: "'Caveat', cursive", fontSize: 15, fontWeight: 600,
-        color: selected ? "#3a2f5e" : "rgba(91,78,138,0.5)",
-        background: selected
-          ? `radial-gradient(ellipse at 35% 35%, ${palette.waterGreenLight} 0%, ${palette.waterGreen}55 100%)`
-          : hovered ? `${palette.waterGreenLight}44` : "transparent",
-        transform: selected ? "rotate(-0.3deg) scale(1.04)" : "scale(1)",
-        transition: "all 0.2s ease", borderRadius: 2,
-      }}
-    >
-      <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", overflow: "visible", pointerEvents: "none" }}>
-        <rect x="2" y="2" width="calc(100% - 4px)" height="calc(100% - 4px)"
-          rx="20" fill="none"
-          stroke={selected ? palette.waterGreen : "rgba(133,167,92,0.35)"}
-          strokeWidth={selected ? "2" : "1.5"}
-          style={{ filter: "url(#sketch)" }}
-        />
-      </svg>
-      {selected ? "✓ " : ""}{label}
-    </div>
-  );
-}
-
-// ── Progress bar ──────────────────────────────────────────────────────────
+// ── Progress indicator ────────────────────────────────────────────────────
 function StepProgress({ step }) {
-  // step: 0=name, 1=tags, 2=time
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 0, marginBottom: 28 }}>
       {[0, 1, 2].map(i => (
@@ -148,172 +58,56 @@ function StepProgress({ step }) {
   );
 }
 
-// ── Main Info/Tags Page ───────────────────────────────────────────────────
-export default function InfoPage({ onNavigate }) {
-  const [step, setStep] = useState(0);
-  const [name, setName] = useState("");
-  const [selectedTags, setSelectedTags] = useState([]);
-  const [selectedTime, setSelectedTime] = useState(null);
-  const [nameError, setNameError] = useState("");
+// ── InfoPage ──────────────────────────────────────────────────────────────
+// Props:
+//   onNavigate  — called with ("connect", { name, tags, time }) when done
+//   initialStep — 0 | 1 | 2  (default 0; pass 1 after login to skip name step)
+//   initialName — pre-filled name from login (used when initialStep=1)
+export default function InfoPage({ onNavigate, initialStep = 0, initialName = "" }) {
+  const [step, setStep]   = useState(initialStep);
+  const [name, setName]   = useState(initialName);
+  const [tags, setTags]   = useState([]);
 
-  const toggleTag = (label) => {
-    setSelectedTags(prev =>
-      prev.includes(label)
-        ? prev.filter(t => t !== label)
-        : prev.length < 5 ? [...prev, label] : prev
-    );
-  };
-
-  const handleNameNext = () => {
-    if (!name.trim()) { setNameError("what should we call you?"); return; }
-    setNameError("");
-    setStep(1);
-  };
-
-  const handleTagsNext = () => {
-    if (selectedTags.length === 0) return;
-    setStep(2);
-  };
-
-  const handleDone = () => {
-    if (!selectedTime) return;
-    onNavigate("connect", { name, tags: selectedTags, time: selectedTime });
+  const handleBack = () => {
+    if (step === 0 || (step === 1 && initialStep === 1)) {
+      onNavigate("landing");
+    } else {
+      setStep(s => s - 1);
+    }
   };
 
   return (
     <PageShell blobs={BLOBS} spores={SPORES}>
-      <TopBar onBack={() => step === 0 ? onNavigate("landing") : setStep(s => s - 1)} />
+      <TopBar onBack={handleBack} />
       <StepProgress step={step} />
 
-      {/* ── STEP 0: Name ── */}
       {step === 0 && (
-        <WatercolorCard color={palette.waterBlue} lightColor={palette.waterBlueLight}>
-          <h2 style={{
-            fontFamily: "'Caveat', cursive", fontSize: 32, fontWeight: 700,
-            color: palette.inkBrown, margin: "0 0 8px", lineHeight: 1.2,
-          }}>
-            First, what&apos;s your{" "}
-            <span style={{ color: palette.waterBlue, fontStyle: "italic" }}>name?</span>
-          </h2>
-          <p style={{
-            fontFamily: "'Caveat', cursive", fontSize: 15, color: palette.softInk,
-            opacity: 0.65, margin: "0 0 20px", fontStyle: "italic",
-          }}>
-            This is how you&apos;ll appear to others nearby.
-          </p>
-          <SketchInput
-            label="Your first name"
-            placeholder="e.g. Maya"
-            value={name}
-            onChange={e => { setName(e.target.value); setNameError(""); }}
-            hasError={!!nameError}
-          />
-          {nameError && (
-            <div style={{ fontFamily: "'Caveat', cursive", fontSize: 14, color: palette.waterRose, fontStyle: "italic", marginBottom: 8 }}>
-              ✦ {nameError}
-            </div>
-          )}
-          <SketchButton color={palette.waterGreen} lightColor={palette.waterGreenLight} onClick={handleNameNext} wide>
-            Next →
-          </SketchButton>
-        </WatercolorCard>
+        <StepName
+          onNext={(enteredName) => {
+            setName(enteredName);
+            setStep(1);
+          }}
+        />
       )}
 
-      {/* ── STEP 1: Tags ── */}
       {step === 1 && (
-        <div style={{ animation: "fadeSlideUp 0.4s ease" }}>
-          <h2 style={{
-            fontFamily: "'Caveat', cursive", fontSize: 32, fontWeight: 700,
-            color: palette.inkBrown, margin: "0 0 6px", lineHeight: 1.2,
-          }}>
-            Hey {name}! What are you{" "}
-            <span style={{ color: palette.waterRose, fontStyle: "italic" }}>into?</span>
-          </h2>
-          <p style={{
-            fontFamily: "'Caveat', cursive", fontSize: 15, color: palette.softInk,
-            opacity: 0.65, margin: "0 0 20px", fontStyle: "italic",
-          }}>
-            Pick up to 5 vibes — we&apos;ll find people who match.
-          </p>
-
-          <div style={{ position: "relative", padding: "20px 16px 16px", marginBottom: 16 }}>
-            {/* Card wash */}
-            <div style={{
-              position: "absolute", inset: "6px 7px 7px 6px", borderRadius: "12px 14px 13px 11px",
-              background: `radial-gradient(ellipse at 25% 25%, ${palette.waterGoldLight} 0%, ${palette.waterGold}33 45%, transparent 72%)`,
-              filter: "url(#watercolor) blur(2px)", zIndex: 0, pointerEvents: "none",
-            }} />
-            <div style={{
-              position: "absolute", inset: "-8px -10px -10px -8px", borderRadius: "20px",
-              background: "rgba(255,255,255,0.75)", filter: "blur(6px)", zIndex: 1, pointerEvents: "none",
-            }} />
-            <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", overflow: "visible", pointerEvents: "none", zIndex: 2 }}>
-              <rect x="3" y="3" width="calc(100% - 6px)" height="calc(100% - 6px)"
-                rx="7" fill="none" stroke="#5C4F8A" strokeWidth="2.2"
-                strokeLinecap="round" strokeLinejoin="round" style={{ filter: "url(#sketch)" }}
-              />
-            </svg>
-            <div style={{ position: "relative", zIndex: 3, display: "flex", flexWrap: "wrap", gap: 8 }}>
-              {ALL_TAGS.map((tag, i) => (
-                <TagPill
-                  key={tag.label}
-                  tag={tag}
-                  selected={selectedTags.includes(tag.label)}
-                  onClick={() => toggleTag(tag.label)}
-                  animDelay={i * 0.04}
-                />
-              ))}
-            </div>
-          </div>
-
-          <div style={{
-            fontFamily: "'Caveat', cursive", fontSize: 13, color: palette.softInk,
-            opacity: 0.45, textAlign: "center", marginBottom: 16,
-          }}>
-            {selectedTags.length}/5 selected
-          </div>
-
-          <SketchButton
-            color={palette.waterGreen} lightColor={palette.waterGreenLight}
-            onClick={handleTagsNext} wide disabled={selectedTags.length === 0}
-          >
-            Next →
-          </SketchButton>
-        </div>
+        <StepTags
+          name={name}
+          onNext={(selectedTags) => {
+            setTags(selectedTags);
+            setStep(2);
+          }}
+        />
       )}
 
-      {/* ── STEP 2: Time ── */}
       {step === 2 && (
-        <WatercolorCard color={palette.waterGreen} lightColor={palette.waterGreenLight}>
-          <h2 style={{
-            fontFamily: "'Caveat', cursive", fontSize: 32, fontWeight: 700,
-            color: palette.inkBrown, margin: "0 0 6px", lineHeight: 1.2,
-          }}>
-            When are you{" "}
-            <span style={{ color: palette.waterGreen, fontStyle: "italic" }}>free?</span>
-          </h2>
-          <p style={{
-            fontFamily: "'Caveat', cursive", fontSize: 15, color: palette.softInk,
-            opacity: 0.65, margin: "0 0 20px", fontStyle: "italic",
-          }}>
-            We&apos;ll only show you people who are free at the same time.
-          </p>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 20 }}>
-            {TIMES.map(t => (
-              <TimePill
-                key={t} label={t}
-                selected={selectedTime === t}
-                onClick={() => setSelectedTime(t)}
-              />
-            ))}
-          </div>
-          <SketchButton
-            color={palette.waterGreen} lightColor={palette.waterGreenLight}
-            onClick={handleDone} wide disabled={!selectedTime}
-          >
-            Find my people →
-          </SketchButton>
-        </WatercolorCard>
+        <StepTime
+          name={name}
+          tags={tags}
+          onDone={({ name: n, tags: t, time }) => {
+            onNavigate("connect", { name: n, tags: t, time });
+          }}
+        />
       )}
 
       <Footer />

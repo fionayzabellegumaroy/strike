@@ -76,19 +76,53 @@ function VerifyBadge() {
 }
 
 // ── Login card ────────────────────────────────────────────────────────────
-function LoginCard({ onBack }) {
+function LoginCard({ onBack, onNavigate }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async () => {
+    if (!email.trim() || !password.trim()) {
+      setError("please fill in both fields ✦");
+      return;
+    }
+    setError("");
+    setLoading(true);
+
+    // ── Replace this block with your real auth call ───────────────────────
+    // e.g. const res = await signInWithEmailAndPassword(auth, email, password);
+    // const displayName = res.user.displayName || email.split("@")[0];
+    await new Promise(r => setTimeout(r, 800)); // simulated network delay
+    const displayName = email.split("@")[0];    // derive name from email
+    // ─────────────────────────────────────────────────────────────────────
+
+    setLoading(false);
+
+    // After login → go to InfoPage starting at step 1 (tags), with name pre-filled
+    onNavigate("info", { initialStep: 1, initialName: displayName });
+  };
+
   return (
     <WatercolorCard color={palette.waterRose} lightColor={palette.waterRoseLight}>
       <div style={{
         fontFamily: "'Caveat', cursive", fontSize: 22, fontWeight: 700,
         color: palette.inkBrown, textAlign: "center", marginBottom: 20, fontStyle: "italic",
       }}>Welcome back ✦</div>
-      <SketchInput label="College email" placeholder="you@university.edu" value={email} onChange={e => setEmail(e.target.value)} type="email" />
-      <SketchInput label="Password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} type="password" />
+      <SketchInput label="College email" placeholder="you@university.edu" value={email} onChange={e => { setEmail(e.target.value); setError(""); }} type="email" />
+      <SketchInput label="Password" placeholder="••••••••" value={password} onChange={e => { setPassword(e.target.value); setError(""); }} type="password" />
+      {error && (
+        <div style={{
+          fontFamily: "'Caveat', cursive", fontSize: 14,
+          color: palette.waterRose, fontStyle: "italic", marginBottom: 8,
+        }}>
+          ✦ {error}
+        </div>
+      )}
       <div style={{ marginTop: 20, display: "flex", flexDirection: "column", gap: 12 }}>
-        <SketchButton color={palette.waterGreen} lightColor={palette.waterGreenLight} wide>Log in →</SketchButton>
+        <SketchButton color={palette.waterGreen} lightColor={palette.waterGreenLight} onClick={handleLogin} wide disabled={loading}>
+          {loading ? "logging in…" : "Log in →"}
+        </SketchButton>
         <SketchButton color={palette.waterBlue} lightColor={palette.waterBlueLight} onClick={onBack} wide>← Back</SketchButton>
       </div>
       <div style={{
@@ -152,7 +186,7 @@ export default function LandingPage({ onNavigate }) {
           </SketchButton>
         </div>
       ) : (
-        <LoginCard onBack={() => setShowLogin(false)} />
+        <LoginCard onBack={() => setShowLogin(false)} onNavigate={onNavigate} />
       )}
 
       <Footer />
