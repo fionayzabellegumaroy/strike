@@ -26,6 +26,7 @@ export default function App() {
     />;
   }
   if (page === "connect") return <ConnectPage onNavigate={navigate} userInfo={userInfo} />;
+  if (page === "register") return <Register    onNavigate={navigate} />;
 
   return <LandingPage onNavigate={navigate} />;
 }

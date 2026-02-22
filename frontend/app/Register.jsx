@@ -168,7 +168,7 @@ export function Spores({ list }) {
   ));
 }
 
-export function PageShell({ children, blobs, spores }) {
+export function Register({ children, blobs, spores }) {
   return (
     <div style={{ minHeight: "100vh", background: "#FFFFFF", fontFamily: "'Caveat', cursive", position: "relative", overflowX: "hidden", overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
       <style dangerouslySetInnerHTML={{ __html: animationCSS }} />

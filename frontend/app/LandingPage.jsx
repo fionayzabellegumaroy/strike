@@ -128,7 +128,10 @@ function LoginCard({ onBack, onNavigate }) {
       <div style={{
         textAlign: "center", marginTop: 14, fontFamily: "'Caveat', cursive",
         fontSize: 13, color: palette.softInk, opacity: 0.5, cursor: "pointer", textDecoration: "underline",
-      }}>Forgot password?</div>
+      }}>
+        <div>Forgot password?</div>
+        <div onClick={() => onNavigate("register")}>Register</div>
+      </div>
     </WatercolorCard>
   );
 }
