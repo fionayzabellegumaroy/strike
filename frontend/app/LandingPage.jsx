@@ -125,13 +125,32 @@ function LoginCard({ onBack, onNavigate }) {
         </SketchButton>
         <SketchButton color={palette.waterBlue} lightColor={palette.waterBlueLight} onClick={onBack} wide>← Back</SketchButton>
       </div>
-      <div style={{
-        textAlign: "center", marginTop: 14, fontFamily: "'Caveat', cursive",
-        fontSize: 13, color: palette.softInk, opacity: 0.5, cursor: "pointer", textDecoration: "underline",
-      }}>
-        <div>Forgot password?</div>
-        <div onClick={() => onNavigate("register")}>Register</div>
+     <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        // gap: 40, // space between them
+        marginTop: 14,
+        fontFamily: "'Caveat', cursive",
+        fontSize: 13,
+        color: palette.softInk,
+        opacity: 0.5,
+      }}
+    >
+      <div
+        style={{ cursor: "pointer", textDecoration: "underline" }}
+        onClick={() => console.log("Forgot password")}
+      >
+        Forgot password?
       </div>
+
+      <div
+        style={{ cursor: "pointer", textDecoration: "underline" }}
+        onClick={() => onNavigate("register")} // Navigate to the Register page
+      >
+        Register
+      </div>
+    </div>
     </WatercolorCard>
   );
 }

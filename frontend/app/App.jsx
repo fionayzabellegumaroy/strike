@@ -3,6 +3,7 @@ import { useState } from "react";
 import LandingPage  from "./LandingPage.jsx";
 import InfoPage     from "./InfoPage.jsx";
 import ConnectPage  from "./ConnectPage.jsx";
+import Register     from "./Register.jsx";
 
 // Simple in-memory router — swap for React Router if you prefer
 export default function App() {
