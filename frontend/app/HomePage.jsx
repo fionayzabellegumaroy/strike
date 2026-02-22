@@ -102,7 +102,7 @@ export default function HomePage({ onNavigate }) {
       {/* Headline */}
       <div style={{ textAlign: "center", marginBottom: 24 }}>
         <h1 style={{
-          fontFamily: "'Caveat', cursive", fontSize: 46, fontWeight: 700,
+          fontFamily: "'Yusei Magic', sans-serif", fontSize: 46, fontWeight: 700,
           color: palette.inkBrown, margin: "0 0 12px", lineHeight: 1.12, letterSpacing: "-0.01em",
         }}>
           Home
@@ -148,7 +148,7 @@ export default function HomePage({ onNavigate }) {
       >
         {groups.length === 0 ? (
           <p style={{
-            fontFamily: "'Caveat', cursive",
+            fontFamily: "'Yusei Magic', sans-serif",
             fontSize: 18,
             color: palette.inkBrown,
             opacity: 0.6,
@@ -158,12 +158,12 @@ export default function HomePage({ onNavigate }) {
           </p>
         ) : (
           groups.map(group => (
-            <div key={group.id} style={{ marginBottom: 16 }} onClick={() => {setShowGroupModal(true); setSelectedGroup(group);}}>
+            <div key={group.id} style={{ marginBottom: 16, fontFamily: "'Yusei Magic', sans-serif", color: "#33316e" }} onClick={() => {setShowGroupModal(true); setSelectedGroup(group);}}>
               <h3 style={{ margin: 0 }}>{group.name}</h3>
-              <div style={{ fontSize: 14, color: palette.softInk, opacity: 0.8 }}>
+              <div style={{ fontSize: 14, color: palette.softInk, opacity: 0.8, fontFamily: "'Yusei Magic', sans-serif" }}>
                 {group.tags.join(", ")}
               </div>
-              <div style={{ fontSize: 14, opacity: 0.6 }}>
+              <div style={{ fontSize: 14, opacity: 0.6, fontFamily: "'Inconsolata', monospace" }}>
                 {group.member_ids.length} members
               </div>
               <div style={{ fontSize: 14 }}>
@@ -176,6 +176,7 @@ export default function HomePage({ onNavigate }) {
 
       {showGroupModal && (
         <div
+          lightColor={palette.waterGreenLight}
           style={{
             position: "fixed",
             inset: 0,
@@ -185,6 +186,8 @@ export default function HomePage({ onNavigate }) {
             alignItems: "center",
             justifyContent: "center",
             zIndex: 9999,
+            fontFamily: "'Yusei Magic', sans-serif",
+            color: "#33316e",
           }}
         >
           <WatercolorCard
