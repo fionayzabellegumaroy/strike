@@ -177,7 +177,30 @@ export default function StepTime({ name, tags, onDone }) {
     name,
     tags,
     dateTime: combined
-  });
+    });
+  };
+
+  const isPastSelection = () => {
+  if (!selectedDate || !selectedTime) return true;
+
+  const [hours, minutes] = selectedTime.split(":").map(Number);
+
+  const selectedDateTime = new Date(
+    selectedDate.getFullYear(),
+    selectedDate.getMonth(),
+    selectedDate.getDate(),
+    hours,
+    minutes,
+    0,
+    0
+  );
+
+  const now = new Date();
+
+  console.log("Selected:", selectedDateTime);
+  console.log("Now:", now);
+
+  return selectedDateTime.getTime() <= now.getTime();
 };
 
   return (
@@ -232,7 +255,7 @@ export default function StepTime({ name, tags, onDone }) {
         lightColor={palette.waterGreenLight}
         onClick={handleSubmit}
         wide
-        disabled={!selectedTime || !selectedDate || new Date(selectedDate) < new Date()}
+        disabled={!selectedTime || !selectedDate || isPastSelection()}
       >
         Find my people →
       </SketchButton>
